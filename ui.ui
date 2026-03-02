@@ -56,7 +56,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="res.qrc">
+       <iconset resource="Ui/res.qrc">
         <normaloff>:/icon/yish.ico</normaloff>:/icon/yish.ico</iconset>
       </property>
       <property name="iconSize">
@@ -339,7 +339,10 @@
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>高级</string>
+     <string>设置</string>
+    </property>
+    <property name="separatorsCollapsible">
+     <bool>false</bool>
     </property>
    </widget>
    <addaction name="menu"/>
@@ -351,7 +354,7 @@
   </action>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="Ui/res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui.ui'
+# Form implementation generated from reading ui file 'f:\Github\SEIG-Auto-Connect\ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -134,6 +134,7 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 296, 26))
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
+        self.menu.setSeparatorsCollapsible(False)
         self.menu.setObjectName("menu")
         MainWindow.setMenuBar(self.menubar)
         self.action = QtWidgets.QAction(MainWindow)
@@ -164,6 +165,6 @@ class Ui_MainWindow(object):
         self.radioButton_3.setText(_translate("MainWindow", "T模式"))
         self.pushButton.setText(_translate("MainWindow", "登录"))
         self.pushButton_2.setText(_translate("MainWindow", "下线"))
-        self.menu.setTitle(_translate("MainWindow", "高级"))
+        self.menu.setTitle(_translate("MainWindow", "设置"))
         self.action.setText(_translate("MainWindow", "登录参数"))
 import Ui.res_rc

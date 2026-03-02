@@ -35,8 +35,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().setupUi(MainWindow)
         self.setWindowTitle(f"SEIG虚空终端{state.version}")
         self.setWindowIcon(QtGui.QIcon(':/icon/yish.ico'))
-        self.run_settings_action = QtWidgets.QAction("登录参数", self)
-        self.menu.addAction(self.run_settings_action)
+        self.menubar.removeAction(self.menu.menuAction())
+        self.run_settings_action = QtWidgets.QAction("设置", self)
+        self.menubar.addAction(self.run_settings_action)
 
     def __init__(self):
 
