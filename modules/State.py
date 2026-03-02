@@ -16,7 +16,7 @@ class global_state:
             return
         self._initialized = True
 
-        self.version = 1.5
+        self.version = 1.6
 
         # 获取用户 AppData\Roaming 路径
         self.config_path = None
@@ -37,6 +37,13 @@ class global_state:
         self.login_mode = 0
         self.mulit_login = 1
         self.mulit_info = {}
+        self.enable_easytier = None
+
+        # EasyTier相关配置
+        self.easytier_port = 51145
+        self.secret_key = "Misaka_Network_Password"
+        self.bind_device = True
+        self.enable_ipv6 = False
 
         # 运行时变量
         self.stop_watch_dog = False

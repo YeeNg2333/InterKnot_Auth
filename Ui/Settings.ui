@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>540</height>
+    <width>392</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>394</width>
-    <height>496</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">* {
-    font-size: 14px;
+    font-size: 10pt;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
@@ -36,13 +36,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>50</height>
+       <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>44</height>
+       <height>49</height>
       </size>
      </property>
      <property name="frameShape">
@@ -105,7 +105,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>280</height>
+           <height>0</height>
           </size>
          </property>
          <property name="frameShape">
@@ -167,7 +167,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>32</height>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -184,7 +184,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>32</height>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -201,7 +201,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>32</height>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -219,79 +219,43 @@
        <string>通过Easytier建立网络共享</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="0" colspan="3">
-        <widget class="QCheckBox" name="checkBox_enable_share">
-         <property name="text">
-          <string>开启共享(BETA)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="3">
-        <widget class="QLabel" name="label_local_ip">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QLabel {
-    color: rgb(207, 1, 1);
-}</string>
-         </property>
-         <property name="text">
-          <string>本机IP：172.xx.xx.xxx</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="3">
-        <widget class="QLabel" name="label_6">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QLabel {
-    color: rgb(152, 152, 152);
-}</string>
-         </property>
-         <property name="text">
-          <string>开启网络共享后，本机网络将通过 EasyTier 共享，其他虚空终端用户可通过输入本机 IP 和密钥连接使用，设备数量不限。</string>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="3">
+       <item row="2" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>隧道配置</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="2" colspan="14">
+           <widget class="QSpinBox" name="spinBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>10000</number>
+            </property>
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+            <property name="stepType">
+             <enum>QAbstractSpinBox::DefaultStepType</enum>
+            </property>
+            <property name="value">
+             <number>51145</number>
+            </property>
+            <property name="displayIntegerBase">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1" colspan="36">
            <widget class="QLineEdit" name="lineEdit_4">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>29</height>
+              <height>23</height>
              </size>
             </property>
            </widget>
@@ -330,32 +294,61 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2" colspan="14">
-           <widget class="QSpinBox" name="spinBox">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>29</height>
-             </size>
-            </property>
-            <property name="minimum">
-             <number>10000</number>
-            </property>
-            <property name="maximum">
-             <number>65535</number>
-            </property>
-            <property name="stepType">
-             <enum>QAbstractSpinBox::DefaultStepType</enum>
-            </property>
-            <property name="value">
-             <number>51145</number>
-            </property>
-            <property name="displayIntegerBase">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
          </layout>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QLabel" name="label_local_ip">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: rgb(207, 1, 1);
+}</string>
+         </property>
+         <property name="text">
+          <string>本机IP：172.xx.xx.xxx</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_6">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    color: rgb(152, 152, 152);
+}</string>
+         </property>
+         <property name="text">
+          <string>开启网络共享后，本机网络将通过 EasyTier 共享，其他绳网用户可通过输入本机 IP 和密钥连接使用，设备数量不限。通过主页“启用共享”建立隧道。</string>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -382,7 +375,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>35</height>
+           <height>30</height>
           </size>
          </property>
          <property name="text">
@@ -407,7 +400,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>35</height>
+           <height>30</height>
           </size>
          </property>
          <property name="text">
@@ -438,10 +431,10 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">font-size: 10pt;</string>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;感谢您使用虚空终端！&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;项目地址:&lt;/span&gt;&lt;a href=&quot;https://github.com/Yish1/SEIG-Auto-Connect&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;github.com/Yish1/SEIG-Auto-Connect&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;注：请不要在任何大型社交平台讨论此工具！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;感谢您接入 &lt;span style=&quot; font-weight:600;&quot;&gt;绳网（InterKnot）&lt;/span&gt;。&lt;/p&gt;&lt;p&gt;在无形的数据洪流之中，我们以结为契，以绳为网，将零散的节点重新编织。绳网源于对效率与自由的追求——让繁琐的认证流程化作一次优雅的连接。&lt;br/&gt;&lt;br/&gt;借助 EasyTier 的组网能力，已连接的设备还可作为出口节点，在封闭的边界之中，悄然编织属于自己的通路。&lt;/p&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/Yish1/InterKnot_Auth&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;github.com/Yish1/InterKnot_Auth&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -474,7 +467,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res/res.qrc"/>
  </resources>
  <connections/>
 </ui>

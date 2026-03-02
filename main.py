@@ -33,7 +33,7 @@ state = global_state()
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setupUi(self, MainWindow):
         super().setupUi(MainWindow)
-        self.setWindowTitle(f"SEIG虚空终端{state.version}")
+        self.setWindowTitle(f"绳网 {state.version}")
         self.setWindowIcon(QtGui.QIcon(':/icon/yish.ico'))
         self.menubar.removeAction(self.menu.menuAction())
         self.run_settings_action = QtWidgets.QAction("设置", self)
@@ -43,11 +43,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         super().__init__()
         self.setupUi(self)  # 初始化UI
-        self.setMinimumSize(QtCore.QSize(296, 705))
+        # self.setMinimumSize(QtCore.QSize(296, 705))
         self.progressBar.hide()
 
         self.tray_icon = QSystemTrayIcon(QtGui.QIcon(':/icon/yish.ico'), self)
-        self.tray_icon.setToolTip(f"SEIG虚空终端{state.version}")
+        self.tray_icon.setToolTip(f"InterKnot_Auth {state.version}")
         # 连接单击托盘图标的事件
         self.tray_icon.activated.connect(self.on_tray_icon_clicked)
 
@@ -84,6 +84,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.checkBox.setChecked(True) if self.checkBox_2.isChecked() else None) or (
                     self.add_to_startup() if self.checkBox_2.isChecked() else self.add_to_startup(1)) or (self.update_config("save_pwd", 1))
         )
+        self.checkBox_auto_share.clicked.connect(lambda: self.update_config(
+            "auto_share", True if self.checkBox_auto_share.isChecked() else False))
 
         self.pushButton_3.clicked.connect(
             lambda: web.open_new("https://cmxz.top"))
@@ -107,7 +109,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.isMinimized():
                 self.hide()  # 隐藏窗口
                 self.tray_icon.showMessage(
-                    f"SEIG虚空终端{state.version}",
+                    f"InterKnot_Auth {state.version}",
                     "程序已最小化到托盘",
                     QSystemTrayIcon.Information,
                     2000
@@ -134,7 +136,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 event.ignore()  # 最小化到托盘
                 self.hide()  # 隐藏窗口
                 self.tray_icon.showMessage(
-                    f"SEIG虚空终端{state.version}",
+                    f"InterKnot_Auth {state.version}",
                     "程序已最小化到托盘",
                     QSystemTrayIcon.Information,
                     2000
@@ -258,6 +260,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             ('wtg_timeout', 5, int),
             ('mulit_login', 1, int),
             ('login_mode', 0, int),
+            ('auto_share', False, bool),
         ]
 
         try:
@@ -610,7 +613,7 @@ if __name__ == "__main__":
             user32 = ctypes.windll.user32
             result = user32.MessageBoxW(
                 None,
-                "另一个虚空终端正在运行。\n是否继续运行？\n\nAnother SAC is already running.\nDo you want to continue?",
+                "另一个绳网认证器正在运行。\n是否继续运行？\n\nAnother InterKnot_Auth is already running.\nDo you want to continue?",
                 "Warning!",
                 0x31
             )
@@ -672,4 +675,4 @@ if __name__ == "__main__":
         user32 = ctypes.windll.user32
         user32.MessageBoxW(None, f"程序启动时遇到严重错误:{e}", "Warning!", 0x30)
         sys.exit()
-# 编译指令nuitka --standalone --lto=yes --msvc=latest --disable-ccache --windows-console-mode=disable --enable-plugin=pyqt5,upx --upx-binary="F:\Programs\upx\upx.exe" --include-data-dir=ddddocr=ddddocr --include-data-dir=jre=jre --include-data-file=login.jar=login.jar --include-package=modules --output-dir=SAC --windows-icon-from-ico=yish.ico --nofollow-import-to=unittest --output-filename=虚空终端.exe main.py
+# 编译指令nuitka --standalone --lto=yes --msvc=latest --disable-ccache --windows-console-mode=disable --enable-plugin=pyqt5,upx --upx-binary="F:\Programs\upx\upx.exe" --include-data-dir=ddddocr=ddddocr --include-data-dir=jre=jre --include-data-file=login.jar=login.jar --include-package=modules --output-dir=SAC --windows-icon-from-ico=yish.ico --nofollow-import-to=unittest --output-filename=绳网认证.exe main.py

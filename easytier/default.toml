@@ -1,0 +1,13 @@
+instance_name = "Misaka_Network"
+ipv4 = "10.114.114.10/24"
+dhcp = false
+listeners = ["wg://0.0.0.0:51145"]
+
+[network_identity]
+network_name = "Misaka_Network"
+network_secret = "123"
+
+[flags]
+bind_device = false
+dev_name = "Misaka_Network"
+enable_exit_node = true

@@ -22,7 +22,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.setWindowTitle("登录参数")
         self.setWindowIcon(QtGui.QIcon(':/icon/yish.ico'))
         # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.resize(260, 420)
+        self.resize(340, 420)
 
         self.label_4.hide()
 
@@ -284,14 +284,14 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
             try:
                 self.pushButton.setEnabled(True)
                 self.label_4.hide()
-                print("成功获取参数")
+                self.Main_window.update_table("成功获取参数")
             except:
                 pass
         except Exception as e:
             if "'NoneType' object has no attribute 'group'" in str(e):
-                print(f"没有从重定向的链接中获取到参数，请检查网线连接，或者是否已经能够上网了？{e}")
+                self.Main_window.update_table(f"没有从重定向的链接中获取到参数，请检查网线连接，或者是否已经能够上网了？{e}")
             else:
-                print(f"获取参数失败(请检查网线，并确保断开了热点)：{e}")
+                self.Main_window.update_table(f"获取参数失败(请检查网线，并确保断开了热点)：{e}")
             self.label_4.show()
             self.pushButton.setEnabled(False)
 
