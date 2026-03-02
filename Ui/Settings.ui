@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>392</width>
-    <height>420</height>
+    <height>507</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -428,7 +428,7 @@
        <string>关于</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_5">
          <property name="styleSheet">
           <string notr="true">font-size: 10pt;</string>
@@ -457,6 +457,19 @@
          </property>
          <property name="text">
           <string>清空所有配置</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButton_8">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>35</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>打开配置路径</string>
          </property>
         </widget>
        </item>

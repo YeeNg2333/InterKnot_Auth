@@ -22,8 +22,8 @@ class global_state:
         self.config_path = None
         # 通常是 C:\Users\<用户名>\AppData\Roaming
         appdata_dir = os.getenv("APPDATA")
-        config_dir = os.path.join(appdata_dir, "SAC")
-        self.config_path = os.path.join(config_dir, "config.ini")
+        self.config_dir = os.path.join(appdata_dir, "SAC")
+        self.config_path = os.path.join(self.config_dir, "config.ini")
 
         # 配置类变量
         self.username = None
@@ -39,6 +39,7 @@ class global_state:
         self.mulit_login = 1
         self.mulit_info = {}
         self.enable_easytier = None
+        self.auto_share = False
 
         # EasyTier相关配置
         self.easytier_port = 51145

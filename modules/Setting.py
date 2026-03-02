@@ -41,6 +41,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.pushButton_5.clicked.connect(self.del_tab)
         self.pushButton_6.clicked.connect(self.mulit_login_now)
         self.pushButton_7.clicked.connect(self.clear_config)
+        self.pushButton_8.clicked.connect(lambda: os.startfile(state.config_dir))
 
         self.get_config_value()
 

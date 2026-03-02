@@ -85,7 +85,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.add_to_startup() if self.checkBox_2.isChecked() else self.add_to_startup(1)) or (self.update_config("save_pwd", 1))
         )
         self.checkBox_auto_share.clicked.connect(lambda: self.update_config(
-            "auto_share", 1 if self.checkBox_auto_share.isChecked() else 0))
+            "auto_share", 1 if self.checkBox_auto_share.isChecked() else 0) or (self.update_table("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked() else self.update_table("已关闭自动共享")))
 
         self.checkBox_t.clicked.connect(lambda: self.change_login_mode(1 if self.checkBox_t.isChecked() else 0))
 
@@ -97,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.run_settings_action.triggered.connect(self.run_settings)
         self.pushButton_4.clicked.connect(self.settings_window.mulit_login_now)
 
-        self.update_table("感谢您使用此工具！\n请不要在任何大型社交平台\n(B站、贴吧、小红书、狐友等)\n讨论此工具！")
+        self.update_table("欢迎加入绳网（InterKnot）！")
 
     def on_tray_icon_clicked(self, reason):
         if reason == QSystemTrayIcon.Trigger:  # 仅响应左键单击
@@ -278,6 +278,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.checkBox_2.setChecked(state.auto_connect == "1")
             self.checkBox_t.setChecked(state.login_mode != 0)
             self.checkBox_dog.setChecked(state.enable_watch_dog == "1")
+            self.checkBox_auto_share.setChecked(state.auto_share == "1")
 
         except Exception as e:
             self.update_table(f"配置读取失败，已重置为默认值！{e} ")
@@ -603,7 +604,7 @@ class login_Retry_Thread(QRunnable):
 
 
 if __name__ == "__main__":
-    try:
+    # try:
         # 防止重复运行
         lock_file = os.path.expanduser("~/.Seig-auto-connect.lock")
         fd = os.open(lock_file, os.O_RDWR | os.O_CREAT)
@@ -672,8 +673,8 @@ if __name__ == "__main__":
         mainWindow.show()
         sys.exit(app.exec_())
 
-    except Exception as e:
-        user32 = ctypes.windll.user32
-        user32.MessageBoxW(None, f"程序启动时遇到严重错误:{e}", "Warning!", 0x30)
-        sys.exit()
+    # except Exception as e:
+    #     user32 = ctypes.windll.user32
+    #     user32.MessageBoxW(None, f"程序启动时遇到严重错误:{e}", "Warning!", 0x30)
+    #     sys.exit()
 # 编译指令nuitka --standalone --lto=yes --msvc=latest --disable-ccache --windows-console-mode=disable --enable-plugin=pyqt5,upx --upx-binary="F:\Programs\upx\upx.exe" --include-data-dir=ddddocr=ddddocr --include-data-dir=jre=jre --include-data-file=login.jar=login.jar --include-package=modules --output-dir=SAC --windows-icon-from-ico=yish.ico --nofollow-import-to=unittest --output-filename=绳网认证.exe main.py

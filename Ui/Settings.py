@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_sac_settings(object):
     def setupUi(self, sac_settings):
         sac_settings.setObjectName("sac_settings")
-        sac_settings.resize(395, 640)
+        sac_settings.resize(392, 507)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -192,12 +192,16 @@ class Ui_sac_settings(object):
         self.label_5.setWordWrap(True)
         self.label_5.setOpenExternalLinks(True)
         self.label_5.setObjectName("label_5")
-        self.gridLayout_4.addWidget(self.label_5, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_5, 2, 0, 1, 1)
         self.pushButton_7 = QtWidgets.QPushButton(self.tab_4)
         self.pushButton_7.setMinimumSize(QtCore.QSize(0, 35))
         self.pushButton_7.setToolTip("")
         self.pushButton_7.setObjectName("pushButton_7")
         self.gridLayout_4.addWidget(self.pushButton_7, 0, 0, 1, 1)
+        self.pushButton_8 = QtWidgets.QPushButton(self.tab_4)
+        self.pushButton_8.setMinimumSize(QtCore.QSize(0, 35))
+        self.pushButton_8.setObjectName("pushButton_8")
+        self.gridLayout_4.addWidget(self.pushButton_8, 1, 0, 1, 1)
         self.tabWidget.addTab(self.tab_4, "")
         self.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
 
@@ -233,5 +237,6 @@ class Ui_sac_settings(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("sac_settings", "多拨配置"))
         self.label_5.setText(_translate("sac_settings", "<html><head/><body><p>感谢您接入 <span style=\" font-weight:600;\">绳网（InterKnot）</span>。</p><p>在无形的数据洪流之中，我们以结为契，以绳为网，将零散的节点重新编织。绳网源于对效率与自由的追求——让繁琐的认证流程化作一次优雅的连接。<br/><br/>借助 EasyTier 的组网能力，已连接的设备还可作为出口节点，在封闭的边界之中，悄然编织属于自己的通路。</p><p>项目地址：<a href=\"https://github.com/Yish1/InterKnot_Auth\"><span style=\" text-decoration: underline; color:#0000ff;\">github.com/Yish1/InterKnot_Auth</span></a></p></body></html>"))
         self.pushButton_7.setText(_translate("sac_settings", "清空所有配置"))
+        self.pushButton_8.setText(_translate("sac_settings", "打开配置路径"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("sac_settings", "关于"))
 import res.res_rc
