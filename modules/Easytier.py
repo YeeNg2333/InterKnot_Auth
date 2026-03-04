@@ -173,8 +173,11 @@ dev_name = "InterKnot"
                 self.add_route()
 
             if "remote_addr" in lower_line and self.mode == "server":
-                self.signals.print_text.emit(f"ET: {line.split('remote_addr: Some(Url { url: "wg://')[1].strip().split(':')[0]} 已连接到绳网！")
-            
+                before, sep, after = line.partition("wg://")
+                if sep:
+                    ip = after.split(":", 1)[0].strip()
+                    self.signals.print_text.emit(f"ET: {ip} 已连接到绳网！")
+
             if "connect to peer error" in lower_line and self.mode == "client":
                 failure_time += 1
                 output = False
