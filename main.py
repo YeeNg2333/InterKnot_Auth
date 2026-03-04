@@ -685,7 +685,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if hasattr(self.et_process, "terminate"):
                 self.et_process.terminate()
                 self.et_process = None
-                self.et_connected = False
                 self.update_list("已停止隧道")
         
                 self.pushButton_enable_share.setText("启用共享")
@@ -693,6 +692,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
                 self.pushButton.setEnabled(True)
 
+                if self.et_connected:
+                    cmd = [
+                        "route",
+                        "delete",
+                        "0.0.0.0",
+                        "10.129.114.10"
+                    ]
+
+                    result = subprocess.run(
+                        cmd,
+                        capture_output=True,
+                        text=True,
+                        shell=True,
+                        creationflags=subprocess.CREATE_NO_WINDOW
+                    )
+
+                    if result.returncode == 0:
+                        self.update_list("路由删除成功")
+                    else:
+                        self.update_list(f"路由删除失败: {result.stderr}")
+
+                self.et_connected = False
+                
         except Exception as e:
             self.update_list(f"停止隧道失败：{e}")
 

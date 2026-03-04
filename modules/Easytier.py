@@ -22,7 +22,7 @@ class easytier_thread(QRunnable):
 
             toml = f'''
 instance_name = "InterKnot"
-ipv4 = "10.114.114.10/24"
+ipv4 = "10.129.114.10/24"
 dhcp = false
 listeners = ["wg://0.0.0.0:{state.et_port}"]
 
@@ -40,7 +40,7 @@ enable_ipv6 = {"true" if state.et_enable_ipv6 == "1" else "false"}
             toml = f'''
 instance_name = "InterKnot"
 dhcp = true
-exit_nodes = ["10.114.114.10"]
+exit_nodes = ["10.129.114.10"]
 
 [network_identity]
 network_name = "InterKnot"
@@ -72,7 +72,7 @@ dev_name = "InterKnot"
             "0.0.0.0",
             "mask",
             "0.0.0.0",
-            "10.114.114.10",
+            "10.129.114.10",
             "metric",
             "1"
         ]
