@@ -667,6 +667,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def start_easytier(self, start=False):
         if state.auto_share == "1" or start:
+            if hasattr(self, "et_connected") and self.et_connected == True:
+                self.show_message(message="您已连接隧道，如需启动共享需先断开隧道!", title="错误")
+                return
+            
             try:
                 self.pushButton_enable_share.setText("停止共享")
                 self.pushButton_enable_share.clicked.disconnect()
