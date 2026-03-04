@@ -165,12 +165,13 @@ dev_name = "InterKnot"
 
             if "new peer connection added" in lower_line and self.mode == "client":
                 self.signals.print_text.emit("ET: 已连接到绳网节点，即将添加路由...")
-                if tun_ok:
+                if tun_ok and not self.route_added:
                     self.add_route()
 
             if "tun device ready" in lower_line and self.mode == "client":
                 tun_ok = True
-                self.add_route()
+                if not self.route_added:
+                    self.add_route()
 
             if "remote_addr" in lower_line and self.mode == "server":
                 before, sep, after = line.partition("wg://")
