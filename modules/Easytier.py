@@ -110,10 +110,10 @@ dev_name = "InterKnot"
         )
 
         if result.returncode == 0:
-            self.update_list("ET: 路由删除成功")
+            self.signals.print_text.emit("ET: 路由删除成功")
             self.route_added = False
         else:
-            self.update_list(f"ET: 路由删除失败: {result.stderr}")
+            self.signals.print_text.emit(f"ET: 路由删除失败: {result.stderr}")
 
     def print_to_all(self, text):
         self.signals.print_text_et.emit(text)
