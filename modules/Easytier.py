@@ -15,6 +15,7 @@ class easytier_thread(QRunnable):
         self.signals = WorkerSignals()
         self.main_window = main_window
         self.mode = mode
+        self.route_added = False
     def check_config_exist(self):
         easytier_config_path = os.path.join(state.config_dir, "easytier.toml")
 
@@ -86,9 +87,11 @@ dev_name = "InterKnot"
         )
 
         if result.returncode == 0:
-            self.print_to_all("ET:路由添加成功")
+            self.print_to_all("ET: 路由添加成功")
+            self.route_added = True
+
         else:
-            self.print_to_all(f"ET:路由添加失败: {result.stderr}")
+            self.print_to_all(f"ET: 路由添加失败: {result.stderr}")
 
     def remove_et_route(self):
         cmd = [
@@ -107,9 +110,10 @@ dev_name = "InterKnot"
         )
 
         if result.returncode == 0:
-            self.update_list("ET:路由删除成功")
+            self.update_list("ET: 路由删除成功")
+            self.route_added = False
         else:
-            self.update_list(f"ET:路由删除失败: {result.stderr}")
+            self.update_list(f"ET: 路由删除失败: {result.stderr}")
 
     def print_to_all(self, text):
         self.signals.print_text_et.emit(text)
@@ -121,7 +125,7 @@ dev_name = "InterKnot"
         if not r:
             return # 找不到EasyTier Core
         
-        self.print_to_all(f"ET:启动绳网共享进程...")
+        self.print_to_all(f"ET: 启动绳网共享进程...")
 
         if hasattr(self.main_window, 'et_process') and self.main_window.et_process is not None:
             if isinstance(self.main_window.et_process, subprocess.Popen) and self.main_window.et_process.poll() is None:
@@ -169,26 +173,26 @@ dev_name = "InterKnot"
                 continue
 
             # 成功启动
-            text = "ET:共享隧道已创建成功，可切换至'隧道日志'查看详情！" if self.mode == "server" else "正在连接到绳网...可切换至'隧道日志'查看详情！"
+            text = "ET: 共享隧道已创建成功，可切换至'隧道日志'查看详情！" if self.mode == "server" else "正在连接到绳网...可切换至'隧道日志'查看详情！"
             if "starting easytier" in lower_line:
                 self.signals.print_text.emit(text)
 
             if "tun device ready" in lower_line and self.mode == "client":
-                self.signals.print_text.emit("ET:TUN已就绪，即将添加路由...")
+                self.signals.print_text.emit("ET: TUN已就绪，即将添加路由...")
                 self.add_route()
 
             if "remote_addr" in lower_line and self.mode == "server":
-                self.signals.print_text.emit(f"ET:{line.split('remote_addr: Some(Url { url: "wg://')[1].strip().split(':')[0]} 已连接到绳网！")
+                self.signals.print_text.emit(f"ET: {line.split('remote_addr: Some(Url { url: "wg://')[1].strip().split(':')[0]} 已连接到绳网！")
             
-            if "connecting to" in lower_line and self.mode == "client":
+            if "connecting to peer error" in lower_line and self.mode == "client":
                 failure_time += 1
-                if failure_time >= 8:
-                    self.signals.print_text.emit("ET:连接绳网失败，删除路由并重试...")
+                if failure_time >= 5 and self.route_added:
+                    self.signals.print_text.emit("ET: 连接绳网失败，删除路由并重试...")
                     self.remove_et_route()
                     failure_time = 0
 
             if "peer connection removed" in lower_line and self.mode == "client":
-                self.signals.print_text.emit("ET:绳网节点失联，删除路由并重试...")
+                self.signals.print_text.emit("ET: 绳网节点失联，删除路由并重试...")
                 self.remove_et_route()
 
             # 输出日志
