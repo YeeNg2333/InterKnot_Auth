@@ -168,7 +168,7 @@ dev_name = "InterKnot"
                 if tun_ok:
                     self.add_route()
 
-            if "tun device ready" in lower_line:
+            if "tun device ready" in lower_line and self.mode == "client":
                 tun_ok = True
                 self.add_route()
 
