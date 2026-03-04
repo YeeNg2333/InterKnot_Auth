@@ -8,6 +8,7 @@ import json
 import time
 import win32com.client
 import msvcrt
+import ipaddress
 # import debugpy
 import builtins
 import threading
@@ -152,6 +153,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             pass
         state.stop_watch_dog = True
+        self.stop_easytier()
         event.accept()
 
     def init_save_password(self):
@@ -291,7 +293,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             ('auto_share', "0", str),
             # Easytier
             ('et_secret_key', "Hello_InterKnot", str),
-            ('et_port', 51145, int),
             ('et_bind_device', 1, int),
             ('et_enable_ipv6', 0, int)
         ]
@@ -342,31 +343,53 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.read_config()
 
+    def is_ipv4(self, text):
+        try:
+            ipaddress.IPv4Address(text)
+            return True
+        except ipaddress.AddressValueError:
+            return False
+
     def login(self, mode=None, ip=None, user=None, pwd=None):
 
-        state.username = self.lineEdit.text()
-        state.password = self.lineEdit_2.text()
+        username = self.lineEdit.text()
+        password = self.lineEdit_2.text()
+        state.username = username
+        state.password = password
 
         if mode == "mulit":
-            state.username = user
-            state.password = pwd
+            username = user
+            password = pwd
             state.wlanuserip = ip
             current_ip = ip
-
+        
+        ipv4_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
+        if ipv4_pattern.match(username): # z正则判断是否是ip
+            is_ip = self.is_ipv4(username)
+            if is_ip:
+                self.connect_et()
+                # 保存账号密码
+                self.save_password()
+                self.update_config("username", username)
+                return
+            else:
+                self.update_list("输的啥玩意啊？IP地址有这样写的吗？")
+                return
+        
         if state.esurfingurl == "0.0.0.0:0" or state.esurfingurl == "自动获取失败,请检查网线连接":
             self.run_settings()
             self.update_list("请先获取或手动填写参数！")
             return
-        if not state.username:
+        if not username:
             self.update_list("账号都不输入登录个锤子啊！")
             return
-        if not state.password or state.password == "0":
+        if not password or password == "0":
             self.update_list("你账号没有密码的吗？？？")
             return
 
         # 判断是否以 't' 开头，仅适用于SEIG
-        if not state.username.startswith('t') and state.login_mode == 0:
-            self.login_jar(state.username, state.password,
+        if not username.startswith('t') and state.login_mode == 0:
+            self.login_jar(username, password,
                            state.wlanuserip, state.wlanacip)
             state.jar_login = True
             return
@@ -441,7 +464,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 # 保存账号密码
                 self.save_password()
-                self.update_config("username", state.username)
+                self.update_config("username", username)
 
         login_thread = login_Thread()
         login_thread.signals.enable_buttoms.connect(
@@ -494,11 +517,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def save_password(self):
         if self.checkBox.isChecked():
+            password = self.lineEdit_2.text()
             encrypted_password = ''.join(
-                chr(ord(char) + 10) for char in state.password)
+                chr(ord(char) + 10) for char in password)
             self.update_config("password", encrypted_password)
 
     def logout(self):
+
+        if hasattr(self, "et_connected") and self.et_connected == True:
+            self.stop_easytier()
+            return
 
         state.username = self.lineEdit.text()
         if state.jar_login:
@@ -644,8 +672,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.pushButton_enable_share.clicked.disconnect()
                 self.pushButton_enable_share.clicked.connect(lambda: self.stop_easytier())
 
-                self.et_process = None
-                self.easytier_thread = easytier_thread(self)
+                self.easytier_thread = easytier_thread(self, mode = "server")
                 self.easytier_thread.signals.print_text.connect(self.update_list)
                 self.easytier_thread.signals.print_text_et.connect(self.update_et_list)
                 self.easytier_thread.signals.finished.connect(self.stop_easytier)
@@ -655,17 +682,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def stop_easytier(self):
         try:
-            if self.et_process is not None:
+            if hasattr(self.et_process, "terminate"):
                 self.et_process.terminate()
                 self.et_process = None
+                self.et_connected = False
                 self.update_list("已停止隧道")
         
                 self.pushButton_enable_share.setText("启用共享")
                 self.pushButton_enable_share.clicked.disconnect()
                 self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
+                self.pushButton.setEnabled(True)
 
         except Exception as e:
             self.update_list(f"停止隧道失败：{e}")
+
+    def connect_et(self):
+        try:
+            # 检查是否有启动服务端
+            if hasattr(self, 'et_process') and self.et_process != None:
+                self.show_message(message="您已启动共享，如需连接隧道需先停止共享!", title="错误")
+                self.pushButton.setEnabled(True)
+                return
+
+            # 禁用登录按钮
+            self.pushButton.setEnabled(False)
+
+            self.easytier_thread = easytier_thread(self, mode = "client")
+            self.easytier_thread.signals.print_text.connect(self.update_list)
+            self.easytier_thread.signals.print_text_et.connect(self.update_et_list)
+            self.easytier_thread.signals.finished.connect(self.stop_easytier)
+            state.threadpool.start(self.easytier_thread)
+            self.et_connected = True
+
+        except Exception as e:
+            self.update_list(f"连接隧道失败：{e}")
 
 class login_Retry_Thread(QRunnable):
     def __init__(self, times, parent=None):
@@ -780,4 +830,26 @@ if __name__ == "__main__":
         user32 = ctypes.windll.user32
         user32.MessageBoxW(None, f"程序启动时遇到严重错误:{e}", "Warning!", 0x30)
         sys.exit()
-# 编译指令nuitka --standalone --lto=yes --msvc=latest --disable-ccache --windows-console-mode=disable --enable-plugin=pyqt5,upx --upx-binary="F:\Programs\upx\upx.exe" --include-data-dir=ddddocr=ddddocr --include-data-dir=jre=jre --include-data-dir=jre=easytier --include-data-file=login.jar=login.jar --include-package=modules --output-dir=SAC --windows-icon-from-ico=yish.ico --nofollow-import-to=unittest --output-filename=绳网认证.exe main.py
+
+# 编译指令
+# '''nuitka --standalone --lto=yes --msvc=latest --disable-ccache `
+# --windows-console-mode=disable `
+# --windows-uac-admin `
+# --enable-plugin=pyqt5,upx `
+# --upx-binary="F:/Programs/upx/upx.exe" `
+# --include-data-dir=ddddocr=ddddocr `
+# --include-data-dir=jre=jre `
+# --include-data-dir=easytier=easytier `
+# --include-data-file=easytier\easytier-core.exe=easytier\easytier-core.exe `
+# --include-data-file=easytier\Packet.dll=easytier\Packet.dll `
+# --include-data-file=easytier\wintun.dll=easytier\wintun.dll `
+# --include-data-file=login.jar=login.jar `
+# --include-package=modules `
+# --output-dir=SAC `
+# --windows-icon-from-ico=yish.ico `
+# --nofollow-import-to=unittest `
+# --output-filename=绳网认证.exe `
+# --remove-output `
+# --assume-yes-for-downloads `
+# --python-flag=no_docstrings `
+# main.py'''

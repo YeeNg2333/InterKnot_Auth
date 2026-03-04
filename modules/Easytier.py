@@ -5,18 +5,22 @@ from modules.Working_signals import WorkerSignals
 
 import subprocess
 import os 
+# import debugpy
 
 state = global_state()
 
 class easytier_thread(QRunnable):
-    def __init__(self, main_window):
+    def __init__(self, main_window, mode):
         super().__init__()
         self.signals = WorkerSignals()
         self.main_window = main_window
+        self.mode = mode
     def check_config_exist(self):
         easytier_config_path = os.path.join(state.config_dir, "easytier.toml")
 
-        toml = f'''
+        if self.mode == "server":
+
+            toml = f'''
 instance_name = "InterKnot"
 ipv4 = "10.114.114.10/24"
 dhcp = false
@@ -31,25 +35,56 @@ bind_device = {"true" if state.et_bind_device == "1" else "false"}
 dev_name = "InterKnot"
 enable_exit_node = true
 enable_ipv6 = {"true" if state.et_enable_ipv6 == "1" else "false"}
-            '''
+''' 
+        elif self.mode == "client":
+            toml = f'''
+instance_name = "InterKnot"
+dhcp = true
+exit_nodes = ["10.114.114.10"]
+
+[network_identity]
+network_name = "InterKnot"
+network_secret = "{state.password}"
+
+[[peer]]
+uri = "wg://{state.username}:51145"
+
+[flags]
+dev_name = "InterKnot"
+'''
+        
         with open(easytier_config_path, "w") as f:
             f.write(toml)
 
     def check_et_exist(self):
         self.easytier_executable = os.path.join(os.getcwd(), "easytier", "easytier-core.exe")
         if not os.path.exists(self.easytier_executable):
-            self.signals.print_text_et.emit("错误：找不到 EasyTier Core！请重新安装绳网！")
-            self.signals.print_text.emit("错误：找不到 EasyTier Core！请重新安装绳网！")
+            self.print_to_all("错误：找不到 EasyTier Core！请重新安装绳网！")
+            self.main_window.et_process = None 
             self.signals.finished.emit()
             return False
         return True
+    
+    def print_to_all(self, text):
+        self.signals.print_text_et.emit(text)
+        self.signals.print_text.emit(text)
+
     def run(self):
         self.check_config_exist()
         r = self.check_et_exist()
         if not r:
             return # 找不到EasyTier Core
         
-        self.signals.print_text_et.emit(f"启动绳网共享进程...")
+        self.print_to_all(f"启动绳网共享进程...")
+
+        if hasattr(self.main_window, 'et_process') and self.main_window.et_process is not None:
+            if isinstance(self.main_window.et_process, subprocess.Popen) and self.main_window.et_process.poll() is None:
+                self.print_to_all("隧道故障：进程重复运行，尝试重启...")
+                self.main_window.et_process.terminate()
+                try:
+                    self.main_window.et_process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    self.main_window.et_process.kill()
 
         self.main_window.et_process = subprocess.Popen(
             [self.easytier_executable,
@@ -86,11 +121,11 @@ enable_ipv6 = {"true" if state.et_enable_ipv6 == "1" else "false"}
                 output = True
                 continue
 
-            # 成功检测
+            # 成功启动
+
+            text = "共享隧道已创建成功，可切换至'隧道日志'查看详情！" if self.mode == "server" else "正在连接到绳网...可切换至'隧道日志'查看详情！"
             if "starting easytier" in lower_line:
-                self.signals.print_text.emit(
-                    "共享隧道已创建成功，可切换至'隧道日志'查看详情！"
-                )
+                self.signals.print_text.emit(text)
 
             # 输出日志
             if output:
