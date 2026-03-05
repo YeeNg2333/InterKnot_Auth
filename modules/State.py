@@ -60,6 +60,7 @@ class global_state:
         self.login_thread_finished = False
         self.mulit_status = {}
         self.mulit_login_active = False
+        self.settings_flag = None
 
         # 初始化线程池
         self.threadpool = QThreadPool()

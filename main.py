@@ -225,6 +225,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if state.auto_connect == "1":
             self.update_list("正在尝试自动连接...")
 
+            if self.is_ipv4(state.username):
+                self.connect_et()
+                return
+
             if not state.username.startswith('t') and state.login_mode == 0:
                 state.jar_login = True
             if state.jar_login:
