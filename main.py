@@ -66,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
 
-        # 启动时运行
+        # 启动前运行
         self.read_config()
         self.init_save_password()
         self.try_auto_connect()
@@ -85,8 +85,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.checkBox.setChecked(True) if self.checkBox_2.isChecked() else None) or (
                     self.add_to_startup() if self.checkBox_2.isChecked() else self.add_to_startup(1)) or (self.update_config("save_pwd", 1))
         )
-        self.checkBox_auto_share.clicked.connect(lambda: self.update_config(
-            "auto_share", 1 if self.checkBox_auto_share.isChecked() else 0) or (self.update_list("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked() else self.update_list("已关闭自动共享")))
+        self.checkBox_auto_share.clicked.connect(lambda checked: self.enable_auto_share(checked))
 
         self.checkBox_t.clicked.connect(lambda: self.change_login_mode(1 if self.checkBox_t.isChecked() else 0))
 
@@ -101,6 +100,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.update_list("欢迎加入绳网（InterKnot）！")
 
+        # 启动后运行
+        self.start_easytier()
+        
     def on_tray_icon_clicked(self, reason):
         if reason == QSystemTrayIcon.Trigger:  # 仅响应左键单击
             self.showNormal()
@@ -225,7 +227,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if state.auto_connect == "1":
             self.update_list("正在尝试自动连接...")
 
+            # 如果登录的方式是隧道，且开启了自动共享，将不会自动登录
             if self.is_ipv4(state.username):
+                if state.auto_share:
+                    self.update_list("警告：自动共享开启且登录方式为隧道时，将不会自动连接！")
+                    return
+                
                 self.connect_et()
                 return
 
@@ -750,6 +757,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         except Exception as e:
             self.update_list(f"连接隧道失败：{e}")
+
+    def enable_auto_share(self, checked):
+        self.update_config("auto_share", 1 if self.checkBox_auto_share.isChecked() else 0)
+        self.update_list("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked() else self.update_list("已关闭自动共享")
+
+        # 如果账号框里时ip，弹出警告
+        if self.is_ipv4(self.lineEdit.text()) and checked:
+            self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")
 
 class login_Retry_Thread(QRunnable):
     def __init__(self, times, parent=None):

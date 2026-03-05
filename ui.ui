@@ -340,6 +340,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QCheckBox" name="checkBox_dog">
+            <property name="toolTip">
+             <string>通过网页版校园网认证登录的账号，可开启看门狗持续监测网路状态，掉线自动重连，非网页版不需要看门狗</string>
+            </property>
             <property name="text">
              <string>看门狗</string>
             </property>
@@ -347,6 +350,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QCheckBox" name="checkBox_t">
+            <property name="toolTip">
+             <string>强制通过网页认证校园网账号</string>
+            </property>
             <property name="text">
              <string>T模式</string>
             </property>
@@ -383,7 +389,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>如果您不清楚此设置的含义，请保持默认不要修改！！！</string>
+          <string/>
          </property>
          <property name="title">
           <string>快捷按钮</string>
@@ -403,6 +409,9 @@
               <height>27</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>通过EasyTier共享本机的网络，任何人都能通过绳网认证输入您的ip和密码连接到共享的网络中</string>
+            </property>
             <property name="text">
              <string>启用共享</string>
             </property>
@@ -410,6 +419,9 @@
           </item>
           <item row="4" column="1">
            <widget class="QCheckBox" name="checkBox_auto_share">
+            <property name="toolTip">
+             <string>程序启动时自动共享设备网络</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -458,6 +470,9 @@
            <height>25</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>输入非t开头的账号走校园网APP认证方式，t开头的或开启t模式走网页认证方式，输入IP则加入共享网络</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -477,7 +492,7 @@
      <x>0</x>
      <y>0</y>
      <width>274</width>
-     <height>29</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

@@ -176,7 +176,7 @@ dev_name = "InterKnot"
                 connect_times = 0
 
             if "new peer connection added" in lower_line and self.mode == "client":
-                self.signals.print_text.emit("ET: 已连接到绳网节点，即将添加路由...\nET: 正在创建TUN网卡...\n")
+                self.signals.print_text.emit("ET: 已连接到绳网节点，即将添加路由...\nET: 正在等待TUN网卡...")
                 if tun_ok and not self.route_added:
                     self.add_route()
 
