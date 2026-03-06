@@ -39,7 +39,7 @@ def open_webview_worker():
     os.environ["WEBVIEW2_USER_DATA_FOLDER"] = "webview_data"
 
     webview.create_window(
-        "InterKnot - Node Monitor",
+        "绳网隧道",
         "http://localhost:50000",
         width=1200,
         height=800
@@ -784,6 +784,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             # 禁用登录按钮
             self.pushButton.setEnabled(False)
+            self.menu_2.menuAction().setVisible(True)
 
             self.easytier_thread = easytier_thread(self, mode = "client")
             self.easytier_thread.signals.print_text.connect(self.update_list)
@@ -794,6 +795,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         except Exception as e:
             self.update_list(f"连接隧道失败：{e}")
+            self.menu_2.menuAction().setVisible(False)
 
     def enable_auto_share(self, checked):
         self.update_config("auto_share", 1 if self.checkBox_auto_share.isChecked() else 0)
@@ -977,23 +979,49 @@ if __name__ == "__main__":
         user32.MessageBoxW(None, f"程序启动时遇到严重错误:{e}", "Warning!", 0x30)
         sys.exit()
 
-# 编译指令
-'''nuitka --standalone --lto=yes --clang --msvc=latest `
---windows-console-mode=disable `
---windows-uac-admin `
---enable-plugin=pyqt5,upx `
---upx-binary="F:/Programs/upx/upx.exe" `
---include-data-dir=ddddocr=ddddocr `
---include-data-dir=jre=jre `
---include-data-dir=easytier=easytier `
---include-data-file=login.jar=login.jar `
---include-package=modules `
---output-dir=SAC `
---windows-icon-from-ico=yish.ico `
---nofollow-import-to=unittest `
---nofollow-import-to=debugpy `
---output-filename=绳网认证.exe `
---remove-output `
---assume-yes-for-downloads `
---python-flag=no_docstrings `
-main.py'''
+# # 编译指令
+# nuitka --standalone --lto=yes --clang --msvc=latest `
+    
+# Windows 设置
+# --windows-console-mode=disable `
+# --windows-uac-admin `
+
+# # 插件
+# --enable-plugin=pyqt5,upx,anti-bloat `
+# --upx-binary="F:/Programs/upx/upx.exe" `
+
+# # 数据文件
+# --include-data-dir=ddddocr=ddddocr `
+# --include-data-dir=jre=jre `
+# --include-data-dir=easytier=easytier `
+# --include-data-file=login.jar=login.jar `
+
+# # Python 模块
+# --include-package=modules `
+
+# # 排除模块
+# --nofollow-import-to=unittest `
+# --nofollow-import-to=debugpy `
+# --nofollow-import-to=pytest `
+# --nofollow-import-to=pydoc `
+# --nofollow-import-to=tkinter `
+# --nofollow-import-to=PyQt5.QtWebEngine `
+# --nofollow-import-to=PyQt5.QtNetwork `
+# --nofollow-import-to=PyQt5.QtQml `
+# --nofollow-import-to=PyQt5.QtQuick `
+
+# # 体积优化
+# --noinclude-qt-translations `
+# --noinclude-setuptools-mode=nofollow `
+# --python-flag=no_docstrings,static_hashes `
+
+# # 输出
+# --output-dir=SAC `
+# --output-filename=绳网认证.exe `
+# --windows-icon-from-ico=yish.ico `
+
+# # 其它
+# --remove-output `
+# --assume-yes-for-downloads `
+
+# main.py
