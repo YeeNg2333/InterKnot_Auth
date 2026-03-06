@@ -2,6 +2,7 @@ from PyQt5.QtCore import QThreadPool, pyqtSignal, QRunnable
 
 from modules.State import global_state
 from modules.Working_signals import WorkerSignals
+from .WebUI import WebUIThread
 
 import subprocess
 import os
@@ -35,6 +36,7 @@ network_name = "InterKnot"
 network_secret = "{state.et_secret_key}"
 
 [flags]
+rpc_portal = "15888"
 bind_device = true
 dev_name = "InterKnot"
 enable_exit_node = true
@@ -54,6 +56,7 @@ network_secret = "{state.password}"
 uri = "wg://{state.username}:51145"
 
 [flags]
+rpc_portal = "15888"
 dev_name = "InterKnot"
 '''
 
@@ -129,6 +132,11 @@ dev_name = "InterKnot"
         self.signals.print_text_et.emit(text)
         self.signals.print_text.emit(text)
 
+    def start_webui(self):
+        if state.webui_thread is None:
+            state.webui_thread = WebUIThread(self.main_window)
+            state.webui_thread.start()
+
     def run(self):
         self.check_config_exist()
         r = self.check_et_exist()
@@ -174,6 +182,7 @@ dev_name = "InterKnot"
             if "starting easytier" in lower_line:
                 self.signals.print_text.emit(text)
                 connect_times = 0
+                self.start_webui()
 
             if "new peer connection added" in lower_line and self.mode == "client":
                 self.signals.print_text.emit("ET: 已连接到绳网节点，即将添加路由...\nET: 正在等待TUN网卡...")

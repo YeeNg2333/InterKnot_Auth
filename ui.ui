@@ -101,8 +101,14 @@
           <property name="movement">
            <enum>QListView::Static</enum>
           </property>
+          <property name="isWrapping" stdset="0">
+           <bool>false</bool>
+          </property>
           <property name="layoutMode">
            <enum>QListView::SinglePass</enum>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -503,11 +509,30 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>绳网</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="action_3"/>
+    <addaction name="actionFairy"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <action name="action">
    <property name="text">
     <string>登录参数</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>隧道信息</string>
+   </property>
+  </action>
+  <action name="actionFairy">
+   <property name="text">
+    <string>Fairy</string>
    </property>
   </action>
  </widget>

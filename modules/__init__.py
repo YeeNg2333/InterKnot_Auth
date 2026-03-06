@@ -7,6 +7,7 @@ from .Working_signals import WorkerSignals
 from .Config_Manager import read_config_file, update_entry
 from .Login_Thread import login_Thread
 from .Easytier import easytier_thread
+from .WebUI import WebUIThread, stop_webui_server
 
 __all__ = [
     "global_state",
@@ -19,4 +20,6 @@ __all__ = [
     "update_entry",
     "login_Thread",
     "easytier_thread",
+    "WebUIThread",
+    "stop_webui_server"
 ]

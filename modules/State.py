@@ -44,8 +44,10 @@ class global_state:
 
         # EasyTier相关配置
         self.et_port = 51145
+        self.et_webui_port = 50000
         self.et_secret_key = "Hello_InterKnot"
         self.et_enable_ipv6 = False
+        self.et_enable_webdl = True
 
         # 运行时变量
         self.stop_watch_dog = False
@@ -60,6 +62,7 @@ class global_state:
         self.mulit_status = {}
         self.mulit_login_active = False
         self.settings_flag = None
+        self.webui_thread = None
 
         # 初始化线程池
         self.threadpool = QThreadPool()

@@ -309,8 +309,9 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.comboBox.addItem("IP仅供参考，分享请使用物理IP")
 
         self.lineEdit_4.setText(state.et_secret_key)
-        self.label_8.setText(f"隧道端口: {state.et_port}")
+        self.label_8.setText(f"隧道端口: {state.et_port} | WebUI: {state.et_webui_port}")
         self.checkBox_2.setChecked(True if state.et_enable_ipv6 else False)
+        self.checkBox.setChecked(True if state.et_enable_webdl else False)
 
     def save_config(self):
         self.Main_window.update_config("esurfingurl", self.lineEdit.text())
@@ -318,6 +319,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.Main_window.update_config("wlanuserip", self.lineEdit_3.text())
         self.Main_window.update_config("et_secret_key", self.lineEdit_4.text())
         self.Main_window.update_config("et_enable_ipv6", 1 if self.checkBox_2.isChecked() else 0)
+        self.Main_window.update_config("et_enable_webdl", 1 if self.checkBox.isChecked() else 0)
         self.close()
 
     def get_default(self):

@@ -11,9 +11,14 @@ import msvcrt
 import ipaddress
 # import debugpy
 import builtins
+import webview
+import zipfile
+import multiprocessing
 import threading
 import binascii
 import subprocess
+import tempfile
+import shutil
 from io import BytesIO
 from PIL import Image, ImageFilter
 import ddddocr
@@ -21,15 +26,25 @@ import webbrowser as web
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtCore import QThreadPool, pyqtSignal, QRunnable, QObject
+
 from Ui.Main_UI import Ui_MainWindow  # 导入ui文件
 from Ui.Settings import Ui_sac_settings
-
 from modules import *
 
 state = global_state()
 # debugpy.listen(("0.0.0.0", 5678))
 # debugpy.wait_for_client()  # 等待调试器连接
 
+def open_webview_worker():
+    os.environ["WEBVIEW2_USER_DATA_FOLDER"] = "webview_data"
+
+    webview.create_window(
+        "InterKnot - Node Monitor",
+        "http://localhost:50000",
+        width=1200,
+        height=800
+    )
+    webview.start()
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setupUi(self, MainWindow):
@@ -38,7 +53,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setWindowIcon(QtGui.QIcon(':/icon/yish.ico'))
         self.menubar.removeAction(self.menu.menuAction())
         self.run_settings_action = QtWidgets.QAction("设置", self)
-        self.menubar.addAction(self.run_settings_action)
+        self.menubar.insertAction(None, self.run_settings_action)
+        self.menu_2.menuAction().setVisible(False)
+        self.action_3.triggered.connect(self.open_webview)
 
     def __init__(self):
 
@@ -156,7 +173,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             pass
         state.stop_watch_dog = True
         self.stop_easytier()
+        self.cleanup_temp_interknot()
         event.accept()
+
+    def cleanup_temp_interknot(self):
+        temp_dir = os.path.join(tempfile.gettempdir(), "InterKnot")
+        if not os.path.exists(temp_dir):
+            return
+
+        try:
+            shutil.rmtree(temp_dir)
+            self.update_list(f"已清理临时目录: {temp_dir}")
+        except Exception as e:
+            self.update_list(f"清理临时目录失败: {e}")
 
     def init_save_password(self):
         if state.save_pwd == "1" and state.password:
@@ -178,6 +207,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
         
@@ -229,7 +259,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             # 如果登录的方式是隧道，且开启了自动共享，将不会自动登录
             if self.is_ipv4(state.username):
-                if state.auto_share:
+                if state.auto_share == "1":
                     self.update_list("警告：自动共享开启且登录方式为隧道时，将不会自动连接！")
                     return
                 
@@ -304,7 +334,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             ('auto_share', "0", str),
             # Easytier
             ('et_secret_key', "Hello_InterKnot", str),
-            ('et_enable_ipv6', 0, int)
+            ('et_enable_ipv6', 0, int),
+            ('et_enable_webdl', 1, int),
         ]
 
         # try:
@@ -692,25 +723,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.easytier_thread.signals.print_text_et.connect(self.update_et_list)
                 self.easytier_thread.signals.finished.connect(self.stop_easytier)
                 state.threadpool.start(self.easytier_thread)
+                self.menu_2.menuAction().setVisible(True)
+
             except Exception as e:
                 self.update_list(f"启动隧道失败：{e}")
+                self.menu_2.menuAction().setVisible(False)
 
     def stop_easytier(self):
         try:
-            if hasattr(self.et_process, "terminate"):
+            et_process = getattr(self, "et_process", None)
+            if hasattr(et_process, "terminate"):
                 self.et_process.terminate()
                 self.et_process = None
                 self.update_list("ET: 已停止隧道")
-        
+
                 self.pushButton_enable_share.setText("启用共享")
                 self.pushButton_enable_share.clicked.disconnect()
                 self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
                 self.pushButton.setEnabled(True)
 
-                if hasattr(self, 'et_connected') and self.et_connected:
-                    self.remove_et_route()
-                    
-                self.et_connected = False
+            if hasattr(self, 'et_connected') and self.et_connected:
+                self.remove_et_route()
+
+            self.et_connected = False
+            self.menu_2.menuAction().setVisible(False)
+            stop_webui_server()
+            self.update_list("ET: WebUI服务端已关闭")
                 
         except Exception as e:
             self.update_list(f"ET: 停止隧道失败：{e}")
@@ -728,6 +766,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             capture_output=True,
             text=True,
             shell=True,
+            encoding='utf-8',
             creationflags=subprocess.CREATE_NO_WINDOW
         )
 
@@ -763,7 +802,67 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # 如果账号框里时ip，弹出警告
         if self.is_ipv4(self.lineEdit.text()) and checked:
-            self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")
+            self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")    
+
+    def open_webview(self):
+        multiprocessing.freeze_support()  # 打包需要
+        p = multiprocessing.Process(
+            target=open_webview_worker,
+            daemon=True
+        )
+        p.start()
+        
+
+    def share_zip(self):
+        if hasattr(self, "processing_zip") and self.processing_zip is True:
+            return
+        
+        self.zip_progress = 0
+        def zip_worker():
+
+            base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+            temp_dir = os.path.join(tempfile.gettempdir(), "InterKnot")
+            os.makedirs(temp_dir, exist_ok=True)
+            temp_zip = os.path.join(temp_dir, "InterKnot.zip.temp")
+            final_zip = os.path.join(temp_dir, "InterKnot.zip")
+
+            exclude_dirs = {'.git', '.venv', 'SAC'}
+
+            all_files = []
+            for root, dirs, files in os.walk(base_dir):
+
+                # 过滤目录
+                dirs[:] = [d for d in dirs if d not in exclude_dirs]
+
+                for file in files:
+                    all_files.append(os.path.join(root, file))
+
+            total = len(all_files)
+            if total == 0:
+                print("没有文件可压缩")
+                return
+
+            with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as z:
+                for i, file_path in enumerate(all_files, 1):
+                    arcname = os.path.relpath(file_path, base_dir)
+                    z.write(file_path, arcname)
+
+                    percent = i / total * 100
+                    self.zip_progress = percent
+                    bar_len = 30
+                    filled_len = int(bar_len * i // total)
+                    bar = '█' * filled_len + '-' * (bar_len - filled_len)
+                    print(f"\r压缩进度: |{bar}| {percent:.1f}% ({i}/{total})", end='')
+
+            # 原子替换
+            os.replace(temp_zip, final_zip)
+
+            self.update_list(f"\n成功创建分享压缩包: {final_zip}")
+            self.processing_zip = False
+
+        t = threading.Thread(target=zip_worker, daemon=True)
+        self.processing_zip = True
+        t.start()
 
 class login_Retry_Thread(QRunnable):
     def __init__(self, times, parent=None):
@@ -880,7 +979,7 @@ if __name__ == "__main__":
         sys.exit()
 
 # 编译指令
-# '''nuitka --standalone --lto=yes --msvc=latest --disable-ccache `
+# '''nuitka --standalone --lto=yes --clang --msvc=latest `
 # --windows-console-mode=disable `
 # --windows-uac-admin `
 # --enable-plugin=pyqt5,upx `
