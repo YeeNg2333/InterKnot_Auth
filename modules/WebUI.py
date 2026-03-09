@@ -1394,16 +1394,17 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                 if not is_local:
                     # 外网引导去外网专属页面
                     self.send_response(302)
-                    self.send_header('Location', '/external')
+                    self.send_header('Location', '/download')
                     self.end_headers()
                     return
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
-                self.wfile.write(HTML_PAGE.encode('utf-8'))
+                page = HTML_PAGE.replace('</body>', f'<div style="text-align: center; margin-top: 5px; margin-bottom: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6;">InterKnot v{state.version}</div></body>')
+                self.wfile.write(page.encode('utf-8'))
             
-            elif self.path == '/external':
+            elif self.path == '/download':
                 # 外网专属页面
                 # 检查是否启用 WebDL
                 if not state.et_enable_webdl:
@@ -1416,7 +1417,8 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
-                self.wfile.write(EXTERNAL_HTML_PAGE.encode('utf-8'))
+                page = EXTERNAL_HTML_PAGE.replace('</body>', f'<div style="text-align: center; padding: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6; position: absolute; bottom: 0;">InterKnot v{state.version}</div></body>')
+                self.wfile.write(page.encode('utf-8'))
             
             elif self.path == '/download/InterKnot':
                 # 提供InterKnot压缩包下载
