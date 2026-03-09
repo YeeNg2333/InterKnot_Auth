@@ -225,7 +225,7 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "密码:"))
         self.groupBox_2.setTitle(_translate("MainWindow", "登录选项"))
         self.checkBox_2.setToolTip(_translate("MainWindow", "开机自动启动，并且启动后自动登录"))
-        self.checkBox_2.setText(_translate("MainWindow", "自动登录"))
+        self.checkBox_2.setText(_translate("MainWindow", "开机自启"))
         self.checkBox.setText(_translate("MainWindow", "记住密码"))
         self.checkBox_dog.setToolTip(_translate("MainWindow", "通过网页版校园网认证登录的账号，可开启看门狗持续监测网路状态，掉线自动重连，非网页版不需要看门狗"))
         self.checkBox_dog.setText(_translate("MainWindow", "看门狗"))

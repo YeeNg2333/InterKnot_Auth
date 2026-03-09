@@ -333,7 +333,7 @@
              <string>开机自动启动，并且启动后自动登录</string>
             </property>
             <property name="text">
-             <string>自动登录</string>
+             <string>开机自启</string>
             </property>
            </widget>
           </item>

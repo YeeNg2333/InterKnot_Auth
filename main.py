@@ -6,22 +6,14 @@ import requests
 import rsa
 import json
 import time
-import win32com.client
 import msvcrt
 import ipaddress
 # import debugpy
-import builtins
-import webview
 import zipfile
-import multiprocessing
 import threading
-import binascii
 import subprocess
 import tempfile
 import shutil
-from io import BytesIO
-from PIL import Image, ImageFilter
-import ddddocr
 import webbrowser as web
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
@@ -35,17 +27,6 @@ state = global_state()
 # debugpy.listen(("0.0.0.0", 5678))
 # debugpy.wait_for_client()  # 等待调试器连接
 
-def open_webview_worker():
-    os.environ["WEBVIEW2_USER_DATA_FOLDER"] = f"{tempfile.gettempdir()}/InterKnot/webview2"
-
-    webview.create_window(
-        "绳网隧道",
-        "http://localhost:50000",
-        width=1200,
-        height=800
-    )
-    webview.start()
-
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setupUi(self, MainWindow):
         super().setupUi(MainWindow)
@@ -55,7 +36,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.run_settings_action = QtWidgets.QAction("设置", self)
         self.menubar.insertAction(None, self.run_settings_action)
         self.menu_2.menuAction().setVisible(False)
-        self.action_3.triggered.connect(self.open_webview)
+        self.action_3.triggered.connect(lambda: os.system("start http://localhost:50000"))
 
     def __init__(self):
 
@@ -207,7 +188,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 cmd,
                 capture_output=True,
                 text=True,
-                encoding='utf-8',
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
         
@@ -804,15 +784,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 如果账号框里时ip，弹出警告
         if self.is_ipv4(self.lineEdit.text()) and checked:
             self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")    
-
-    def open_webview(self):
-        multiprocessing.freeze_support()  # 打包需要
-        p = multiprocessing.Process(
-            target=open_webview_worker,
-            daemon=True
-        )
-        p.start()
-        
 
     def share_zip(self):
         if hasattr(self, "processing_zip") and self.processing_zip is True:
