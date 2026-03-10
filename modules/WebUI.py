@@ -18,7 +18,7 @@ PORT = 50000
 _webui_httpd = None
 _webui_httpd_lock = threading.Lock()
 
-EXTERNAL_HTML_PAGE = """
+DOWNLOAD_HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1417,7 +1417,7 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
-                page = EXTERNAL_HTML_PAGE.replace('</body>', f'<div style="text-align: center; padding: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6; position: absolute; bottom: 0;">InterKnot v{state.version}</div></body>')
+                page = DOWNLOAD_HTML_PAGE.replace('</body>', f'<div style="text-align: center; padding: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6; position: absolute; bottom: 20px; left: 0; right: 0;">InterKnot v{state.version}</div></body>')
                 self.wfile.write(page.encode('utf-8'))
             
             elif self.path == '/download/InterKnot':
@@ -1432,12 +1432,12 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
 
                 temp_dir = os.path.join(tempfile.gettempdir(), "InterKnot")
                 file_path = os.path.join(temp_dir, "InterKnot.zip")
-                log_path = os.path.join(temp_dir, "downloads.log")
+                log_path = os.path.join(state.config_dir, "downloads.log")
                 
                 if os.path.exists(file_path):
                     # 文件存在，记录下载日志
                     try:
-                        os.makedirs(temp_dir, exist_ok=True)
+                        os.makedirs(state.config_dir, exist_ok=True)
                         with open(log_path, 'a', encoding='utf-8') as log_file:
                             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                             log_file.write(f"[{timestamp}] Download from {client_ip}\n")

@@ -255,7 +255,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.comboBox_username.setCurrentText(state.username)
 
             # 添加提示
-            self.comboBox_username.addItem("—— 右键单击账号可删除密码 ——")
+            self.comboBox_username.addItem("—右键单击可删除账号—")
 
             # 禁用提示
             item = self.comboBox_username.model().item(self.comboBox_username.count() - 1)
