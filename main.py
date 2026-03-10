@@ -66,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # 启动前运行
         self.read_config()
-        self.init_save_password()
+        self.get_password()
         self.try_auto_connect()
 
         # 初始化Setting
@@ -75,8 +75,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 绑定按钮功能
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.logout)
-        self.checkBox.clicked.connect(lambda: self.update_config(
-            "save_pwd", 1 if self.checkBox.isChecked() else 0))
+        self.checkBox.clicked.connect(lambda checked: self.init_save_password(checked))
+        
         self.checkBox_2.clicked.connect(lambda: self.update_config(
             "auto_connect", 1 if self.checkBox_2.isChecked() else 0) or (
                 self.update_list("开机将自启，并自动登录，需要记住密码\n看门狗每10分钟检测一次网络连接情况\n下次自动登录成功时，将启动看门狗") if self.checkBox_2.isChecked() else None) or (
@@ -168,17 +168,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except Exception as e:
             self.update_list(f"清理临时目录失败: {e}")
 
-    def init_save_password(self):
-        if state.save_pwd == "1" and state.password:
-            decrypted_password = ''.join(
-                chr(ord(char) - 10) for char in state.password)
-            if self.lineEdit_2.text() != "":
-                pass
-            else:
-                self.lineEdit_2.setText(decrypted_password)
-        else:
-            pass
+    def get_password(self):
+        aes_key = SecurityManager.get_encryption_key()
+
+        if state.password != aes_key.hex():
+            self.show_message("警告", "检测到设备已更换或未保存有效密码，请重新输入密码！\n\nInterKnot_Auth 密码采用机器指纹加密，与设备绑定，设备变化将无法解密")
+
+        elif state.password == aes_key.hex():
+            passwaord = SecurityManager.get_password(state.username)
+            self.lineEdit_2.setText(passwaord if passwaord else "")
+            print(f"成功获取密码: {passwaord}")
+
         self.lineEdit.setText(state.username)
+
+    def init_save_password(self, checked=True):
+        if checked:
+            # 新加密流程：保存hashed机器码到password项，使用hashed机器码作为密钥，真密码加密保存到windows凭据管理器，解密时调用
+            aes_key = SecurityManager.get_encryption_key()
+            self.update_config("password", aes_key.hex())
+
+            password = self.lineEdit_2.text()
+
+            username = self.lineEdit.text()
+            SecurityManager.save_password(username, password)
 
     def add_to_startup(self, mode=None):
 
@@ -391,7 +403,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if is_ip:
                 self.connect_et()
                 # 保存账号密码
-                self.save_password()
+                self.init_save_password()
                 self.update_config("username", username)
                 return
             else:
@@ -485,7 +497,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             else:
                 # 保存账号密码
-                self.save_password()
+                self.init_save_password()
                 self.update_config("username", username)
 
         login_thread = login_Thread()
@@ -531,18 +543,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.jar_Thread.signals.update_check.connect(
                 self.check_new_version)
             self.jar_Thread.signals.jar_login_success.connect(
-                self.save_password)
+                self.init_save_password)
             state.threadpool.start(self.jar_Thread)
         except Exception as e:
             self.update_list(f"登录失败：{e}")
             self.enable_buttoms(1)
-
-    def save_password(self):
-        if self.checkBox.isChecked():
-            password = self.lineEdit_2.text()
-            encrypted_password = ''.join(
-                chr(ord(char) + 10) for char in password)
-            self.update_config("password", encrypted_password)
 
     def logout(self):
 

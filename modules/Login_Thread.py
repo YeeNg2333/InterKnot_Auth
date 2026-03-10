@@ -134,7 +134,7 @@ class login_Thread(QRunnable):
                                        "http": None, "https": None}, verify=False)
                 if response.status_code == 200:
                     image = Image.open(BytesIO(response.content))
-                    ocr = ddddocr.DdddOcr(show_ad=False)
+                    ocr = ddddocr.DdddOcr(show_ad=False, ocr=True)
                     processed_image = self.preprocess_image(image)
                     # image.show()
                     code = ocr.classification(processed_image)

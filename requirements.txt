@@ -2,8 +2,9 @@ requests
 rsa
 debugpy
 Pillow
-ddddocr
+ddddocr==1.5.6
 PyQt5
 pywin32
 nuitka
-pywebview
+pycryptodome
+keyring
