@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>274</width>
+    <width>273</width>
     <height>647</height>
    </rect>
   </property>
@@ -264,6 +264,29 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item row="6" column="0" colspan="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>7</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>账号:</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="minimumSize">
@@ -295,19 +318,6 @@
           <string>密码:</string>
          </property>
         </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>11</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="5" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_2">
@@ -366,19 +376,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item row="6" column="0" colspan="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>7</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="7" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
@@ -458,32 +455,35 @@
          </layout>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
-         <property name="styleSheet">
-          <string notr="true"/>
+       <item row="4" column="0" colspan="2">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="text">
-          <string>账号:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="minimumSize">
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
-           <height>25</height>
+           <width>40</width>
+           <height>11</height>
           </size>
          </property>
+        </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="comboBox_username">
          <property name="toolTip">
           <string>输入非t开头的账号走校园网APP认证方式，t开头的或开启t模式走网页认证方式，输入IP则加入共享网络</string>
          </property>
-         <property name="text">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+         <property name="currentText">
           <string/>
          </property>
          <property name="placeholderText">
           <string>输入账号或启用共享的节点IP</string>
+         </property>
+         <property name="duplicatesEnabled">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -497,7 +497,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>274</width>
+     <width>273</width>
      <height>25</height>
     </rect>
    </property>

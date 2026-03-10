@@ -17,7 +17,8 @@ import shutil
 import webbrowser as web
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
-from PyQt5.QtCore import QThreadPool, pyqtSignal, QRunnable, QObject
+from PyQt5.QtCore import QThreadPool, pyqtSignal, QRunnable, QObject, Qt
+from PyQt5.QtGui import QColor
 
 from Ui.Main_UI import Ui_MainWindow  # 导入ui文件
 from Ui.Settings import Ui_sac_settings
@@ -65,8 +66,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tray_icon.show()
 
         # 启动前运行
+        self.update_list("欢迎加入绳网（InterKnot）！")
         self.read_config()
         self.get_password()
+        self.add_account_to_combox()
         self.try_auto_connect()
 
         # 初始化Setting
@@ -75,7 +78,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 绑定按钮功能
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.logout)
-        self.checkBox.clicked.connect(lambda checked: self.init_save_password(checked))
+        self.checkBox.clicked.connect(lambda checked: (self.update_config("save_pwd", "1" if checked else "0") or self.init_save_password(checked)))
         
         self.checkBox_2.clicked.connect(lambda: self.update_config(
             "auto_connect", 1 if self.checkBox_2.isChecked() else 0) or (
@@ -96,10 +99,39 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton_4.clicked.connect(self.settings_window.mulit_login_now)
         self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
 
-        self.update_list("欢迎加入绳网（InterKnot）！")
+        self.comboBox_username.currentTextChanged.connect(self.on_user_changed)
+        view = self.comboBox_username.view()
+        view.setContextMenuPolicy(Qt.CustomContextMenu)
+        view.customContextMenuRequested.connect(self.show_combo_menu)
 
         # 启动后运行
         self.start_easytier()
+
+    def show_combo_menu(self, pos):
+        view = self.comboBox_username.view()
+        index = view.indexAt(pos)
+
+        if not index.isValid():
+            return
+        
+        row = index.row()
+        username = self.comboBox_username.itemText(row)
+
+        reply = QMessageBox.question(
+            self,
+            "删除保存的账号",
+            f"确定删除账号 {username} 吗？",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            # 删除UI项
+            self.comboBox_username.blockSignals(True)
+            self.comboBox_username.removeItem(row)
+            self.comboBox_username.blockSignals(False)
+            # 删除凭据管理器中的密码
+            SecurityManager.delete_password(username)
 
     def on_tray_icon_clicked(self, reason):
         if reason == QSystemTrayIcon.Trigger:  # 仅响应左键单击
@@ -169,28 +201,77 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.update_list(f"清理临时目录失败: {e}")
 
     def get_password(self):
+        if state.save_pwd != "1":
+            return
+        
         aes_key = SecurityManager.get_encryption_key()
 
         if state.password != aes_key.hex():
-            self.show_message("警告", "检测到设备已更换或未保存有效密码，请重新输入密码！\n\nInterKnot_Auth 密码采用机器指纹加密，与设备绑定，设备变化将无法解密")
+            self.update_list("检测到设备已更换或未保存有效密码，请重新输入密码！\nInterKnot_Auth 密码采用机器指纹加密，与设备绑定，设备变化将无法解密")
 
         elif state.password == aes_key.hex():
-            passwaord = SecurityManager.get_password(state.username)
-            self.lineEdit_2.setText(passwaord if passwaord else "")
-            print(f"成功获取密码: {passwaord}")
-
-        self.lineEdit.setText(state.username)
+            password = SecurityManager.get_password(state.username)
+            self.lineEdit_2.setText(password if password else "")
+            # print(f"成功获取密码: {password}")
 
     def init_save_password(self, checked=True):
-        if checked:
+        if checked and state.save_pwd == '1':
             # 新加密流程：保存hashed机器码到password项，使用hashed机器码作为密钥，真密码加密保存到windows凭据管理器，解密时调用
             aes_key = SecurityManager.get_encryption_key()
             self.update_config("password", aes_key.hex())
 
             password = self.lineEdit_2.text()
 
-            username = self.lineEdit.text()
+            username = self.comboBox_username.currentText()
             SecurityManager.save_password(username, password)
+
+        elif checked == False:
+            all_account = CredentialManager.list_usernames("InterKnot")
+            for account in all_account:
+                SecurityManager.delete_password(account)
+            self.update_config("password", "")
+
+    def add_account_to_combox(self):
+        # 获取所有已保存的账号
+        current_accounts = self.comboBox_username.currentText()
+
+        # 清除列表
+        self.comboBox_username.clear()
+
+        accounts = CredentialManager.list_usernames(service="InterKnot")
+        if accounts is not None: # 将保存的账号添加到下拉框中
+            for username in accounts:
+                self.comboBox_username.addItem(username)
+
+            if current_accounts != '':
+                self.comboBox_username.setCurrentText(current_accounts)
+
+            elif state.username in accounts: # 选择配置文件中的账号
+                index = self.comboBox_username.findText(state.username)
+                if index != -1:
+                    self.comboBox_username.setCurrentIndex(index)
+
+            else:
+                self.comboBox_username.setCurrentText(state.username)
+
+            # 添加提示
+            self.comboBox_username.addItem("—— 右键单击账号可删除密码 ——")
+
+            # 禁用提示
+            item = self.comboBox_username.model().item(self.comboBox_username.count() - 1)
+            item.setEnabled(False)
+            item.setForeground(QColor(150,150,150))
+
+    def on_user_changed(self, username):
+        if username == "":
+            return
+        
+        password = SecurityManager.get_password(username)
+        self.lineEdit_2.setText(password if password else "")
+
+        self.comboBox_username.blockSignals(True)
+        self.add_account_to_combox()
+        self.comboBox_username.blockSignals(False)
 
     def add_to_startup(self, mode=None):
 
@@ -385,7 +466,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def login(self, mode=None, ip=None, user=None, pwd=None):
 
-        username = self.lineEdit.text()
+        username = self.comboBox_username.currentText()
         password = self.lineEdit_2.text()
 
         if mode == "mulit":
@@ -555,7 +636,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.stop_easytier()
             return
 
-        state.username = self.lineEdit.text()
+        state.username = self.comboBox_username.currentText()
         if state.jar_login:
             if not os.path.exists('logout.signal'):
                 with open('logout.signal', 'w', encoding='utf-8') as file:
@@ -597,12 +678,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def enable_buttoms(self, mode):
         if mode == 0:
-            self.lineEdit.setEnabled(False)
+            self.comboBox_username.setEnabled(False)
             self.lineEdit_2.setEnabled(False)
             self.pushButton.setEnabled(False)
             self.pushButton_2.setEnabled(False)
         if mode == 1:
-            self.lineEdit.setEnabled(True)
+            self.comboBox_username.setEnabled(True)
             self.lineEdit_2.setEnabled(True)
             self.pushButton.setEnabled(True)
             self.pushButton_2.setEnabled(True)
@@ -787,7 +868,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.update_list("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked() else self.update_list("已关闭自动共享")
 
         # 如果账号框里时ip，弹出警告
-        if self.is_ipv4(self.lineEdit.text()) and checked:
+        if self.is_ipv4(self.comboBox_username.currentText()) and checked:
             self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")    
 
     def share_zip(self):

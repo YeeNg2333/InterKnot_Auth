@@ -8,7 +8,7 @@ from .Config_Manager import read_config_file, update_entry
 from .Login_Thread import login_Thread
 from .Easytier import easytier_thread
 from .WebUI import WebUIThread, stop_webui_server
-from .SecurityManager import SecurityManager
+from .SecurityManager import SecurityManager, CredentialManager
 
 __all__ = [
     "global_state",
@@ -23,5 +23,6 @@ __all__ = [
     "easytier_thread",
     "WebUIThread",
     "stop_webui_server",
-    "SecurityManager"
+    "SecurityManager",
+    "CredentialManager"
 ]

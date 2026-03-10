@@ -5,7 +5,8 @@ import base64
 import os
 import keyring
 import winreg
-
+import ctypes
+from ctypes import wintypes
 
 
 class SecurityManager:
@@ -83,4 +84,78 @@ class SecurityManager:
         if encrypted_password is None:
             return None
 
-        return SecurityManager.decrypt(encrypted_password, key)
+        try:
+            decrypted_password = SecurityManager.decrypt(encrypted_password, key)
+        except Exception as e:
+            print(f"Error decrypting password for {username}: {e}")
+            keyring.delete_password("InterKnot", username)
+            return ""
+
+        return decrypted_password
+
+    @staticmethod
+    def delete_password(username: str):
+        try:
+            keyring.delete_password("InterKnot", username)
+            print(f"Password for {username} deleted.")
+        except: pass
+
+class CredentialManager:
+
+    advapi32 = ctypes.WinDLL("Advapi32.dll")
+
+    class CREDENTIAL(ctypes.Structure):
+        _fields_ = [
+            ("Flags", wintypes.DWORD),
+            ("Type", wintypes.DWORD),
+            ("TargetName", wintypes.LPWSTR),
+            ("Comment", wintypes.LPWSTR),
+            ("LastWritten", wintypes.FILETIME),
+            ("CredentialBlobSize", wintypes.DWORD),
+            ("CredentialBlob", ctypes.c_void_p),
+            ("Persist", wintypes.DWORD),
+            ("AttributeCount", wintypes.DWORD),
+            ("Attributes", ctypes.c_void_p),
+            ("TargetAlias", wintypes.LPWSTR),
+            ("UserName", wintypes.LPWSTR),
+        ]
+
+    PCREDENTIAL_PTR = ctypes.POINTER(ctypes.POINTER(CREDENTIAL))
+
+    CredEnumerate = advapi32.CredEnumerateW
+    CredFree = advapi32.CredFree
+
+    CredEnumerate.argtypes = [
+        wintypes.LPCWSTR,
+        wintypes.DWORD,
+        ctypes.POINTER(wintypes.DWORD),
+        ctypes.POINTER(PCREDENTIAL_PTR),
+    ]
+
+    CredFree.argtypes = [ctypes.c_void_p]
+
+    @staticmethod
+    def list_usernames(service=None):
+        """返回凭据管理器中的用户名列表，如 ['a','b']"""
+        count = wintypes.DWORD()
+        creds = CredentialManager.PCREDENTIAL_PTR()
+        users = []
+
+        if CredentialManager.CredEnumerate(None, 0, ctypes.byref(count), ctypes.byref(creds)):
+            for i in range(count.value):
+                cred = creds[i].contents
+                target = cred.TargetName
+                username = cred.UserName
+
+                # service 过滤（包含匹配）
+                if username and (service is None or (target and service in target)):
+                    users.append(username)
+
+            CredentialManager.CredFree(creds)
+
+        # 去重
+        return list(dict.fromkeys(users))
+    
+
+# a = CredentialManager.list_usernames(service="InterKnot")
+# print(a) 
