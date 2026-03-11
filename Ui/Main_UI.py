@@ -213,6 +213,20 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.comboBox_username, self.lineEdit_2)
+        MainWindow.setTabOrder(self.lineEdit_2, self.checkBox)
+        MainWindow.setTabOrder(self.checkBox, self.checkBox_2)
+        MainWindow.setTabOrder(self.checkBox_2, self.checkBox_dog)
+        MainWindow.setTabOrder(self.checkBox_dog, self.checkBox_t)
+        MainWindow.setTabOrder(self.checkBox_t, self.pushButton_4)
+        MainWindow.setTabOrder(self.pushButton_4, self.pushButton_enable_share)
+        MainWindow.setTabOrder(self.pushButton_enable_share, self.checkBox_auto_share)
+        MainWindow.setTabOrder(self.checkBox_auto_share, self.pushButton)
+        MainWindow.setTabOrder(self.pushButton, self.pushButton_2)
+        MainWindow.setTabOrder(self.pushButton_2, self.listWidget_easytier)
+        MainWindow.setTabOrder(self.listWidget_easytier, self.pushButton_3)
+        MainWindow.setTabOrder(self.pushButton_3, self.listWidget)
+        MainWindow.setTabOrder(self.listWidget, self.tabWidget)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

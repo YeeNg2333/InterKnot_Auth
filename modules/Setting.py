@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QSystemTrayIcon
 from PyQt5.QtCore import QThreadPool, pyqtSignal, QRunnable, QObject, QTimer, QMutex
 from Ui.Main_UI import Ui_MainWindow  # 导入ui文件
 from Ui.Settings import Ui_sac_settings
+from modules.SecurityManager import *
 
 from modules.State import global_state
 
@@ -187,13 +188,14 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                 if '=' in line:
                     key, value = line.strip().split('=', 1)
 
-                    if "line_edit" in key:
+                    if key.startswith("[line_edit_"):
                         if key.strip('[]').split('_')[3] == '3':
-                            value = ''.join(
-                                chr(ord(char) - 10) for char in value)
+                            encrypt_key = SecurityManager.get_encryption_key()
+                            value = SecurityManager.decrypt(value, encrypt_key)
 
-                        tab_num = key.strip('[]').split('_')[2]
-                        login_info = key.strip('[]').split('_')[3]
+                        parts = key.strip('[]').split('_')
+                        tab_num = parts[2]
+                        login_info = parts[3]
 
                         if tab_num not in state.mulit_info:
                             state.mulit_info[tab_num] = {}
@@ -217,9 +219,11 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
 
     def on_text_changed(self, line_edit, text):
         # 在这里处理文本变化的信号
-        if line_edit.objectName().split('_')[3] == "3":
-            encrypted_password = ''.join(
-                chr(ord(char) + 10) for char in text)
+        if line_edit.objectName().split('_')[3] == "3": # 如果修改的linedit是密码
+            encrypted_password = SecurityManager.encrypt(text, SecurityManager.get_encryption_key())
+
+            print(text)
+
             self.Main_window.update_config(
                 line_edit.objectName(), encrypted_password)
             return

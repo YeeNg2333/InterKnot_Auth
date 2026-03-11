@@ -438,6 +438,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                             title="欢迎",
                             first=1)
             self.update_config("first_run", 0)
+            self.remove_useless_config(state.config_path)
 
         # except Exception as e:
         #     self.update_list(f"配置读取失败，已重置为默认值！{e} ")
@@ -456,6 +457,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             pass
         else:
             self.read_config()
+
+    def remove_useless_config(self, file_path):
+        pattern = re.compile(r"\[line_edit_\d+_3\]")
+
+        new_lines = []
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if pattern.match(line.strip().split("=")[0]):
+                    continue
+                new_lines.append(line)
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.writelines(new_lines)
 
     def is_ipv4(self, text):
         try:
@@ -717,7 +732,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(text)
 
     def check_new_version(self):
-        if state.new_version_checked: return
         
         self.update_thread = UpdateThread()
         state.threadpool.start(self.update_thread)
@@ -728,6 +742,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.update_thread.signals.logout.connect(self.logout)
         # self.update_thread.signals.finished.connect(
         #     lambda: self.update_list("检查更新线程结束"))
+        state.new_version_checked = True
 
     def update_message(self, message):  # 更新弹窗
         msgBox = QMessageBox()

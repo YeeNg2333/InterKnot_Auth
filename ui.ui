@@ -536,6 +536,23 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>comboBox_username</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>checkBox_dog</tabstop>
+  <tabstop>checkBox_t</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>pushButton_enable_share</tabstop>
+  <tabstop>checkBox_auto_share</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>listWidget_easytier</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources>
   <include location="res/res.qrc"/>
  </resources>
