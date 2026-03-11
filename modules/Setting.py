@@ -23,7 +23,8 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.setupUi(central_widget)
         self.setWindowTitle("登录参数")
         self.setWindowIcon(QtGui.QIcon(':/icon/yish.ico'))
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinMaxButtonsHint)
+        self.setWindowFlags(self.windowFlags() & ~
+                            QtCore.Qt.WindowMinMaxButtonsHint)
         # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.resize(340, 420)
 
@@ -44,7 +45,8 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.pushButton_5.clicked.connect(self.del_tab)
         self.pushButton_6.clicked.connect(self.mulit_login_now)
         self.pushButton_7.clicked.connect(self.clear_config)
-        self.pushButton_8.clicked.connect(lambda: os.startfile(state.config_dir))
+        self.pushButton_8.clicked.connect(
+            lambda: os.startfile(state.config_dir))
 
         self.get_config_value()
 
@@ -219,10 +221,9 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
 
     def on_text_changed(self, line_edit, text):
         # 在这里处理文本变化的信号
-        if line_edit.objectName().split('_')[3] == "3": # 如果修改的linedit是密码
-            encrypted_password = SecurityManager.encrypt(text, SecurityManager.get_encryption_key())
-
-            print(text)
+        if line_edit.objectName().split('_')[3] == "3":  # 如果修改的linedit是密码
+            encrypted_password = SecurityManager.encrypt(
+                text, SecurityManager.get_encryption_key())
 
             self.Main_window.update_config(
                 line_edit.objectName(), encrypted_password)
@@ -303,17 +304,20 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                             iplist.insert(0, ip)
 
         return iplist if iplist else "未获取有效IP地址"
+
     def get_config_value(self):
         self.lineEdit.setText(state.esurfingurl)
         self.lineEdit_2.setText(state.wlanacip)
         self.lineEdit_3.setText(state.wlanuserip)
         # 获取本地网卡IP
         local_ip = self.get_lan_ip()
-        self.comboBox.addItem(local_ip if isinstance(local_ip, str) else local_ip[0])
+        self.comboBox.addItem(local_ip if isinstance(
+            local_ip, str) else local_ip[0])
         self.comboBox.addItem("IP仅供参考，分享请使用物理IP")
 
         self.lineEdit_4.setText(state.et_secret_key)
-        self.label_8.setText(f"隧道端口: {state.et_port} | WebUI: {state.et_webui_port}")
+        self.label_8.setText(
+            f"隧道端口: {state.et_port} | WebUI: {state.et_webui_port}")
         self.checkBox_2.setChecked(True if state.et_enable_ipv6 else False)
         self.checkBox.setChecked(True if state.et_enable_webdl else False)
 
@@ -322,8 +326,10 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.Main_window.update_config("wlanacip", self.lineEdit_2.text())
         self.Main_window.update_config("wlanuserip", self.lineEdit_3.text())
         self.Main_window.update_config("et_secret_key", self.lineEdit_4.text())
-        self.Main_window.update_config("et_enable_ipv6", 1 if self.checkBox_2.isChecked() else 0)
-        self.Main_window.update_config("et_enable_webdl", 1 if self.checkBox.isChecked() else 0)
+        self.Main_window.update_config(
+            "et_enable_ipv6", 1 if self.checkBox_2.isChecked() else 0)
+        self.Main_window.update_config(
+            "et_enable_webdl", 1 if self.checkBox.isChecked() else 0)
         self.close()
 
     def get_default(self):
@@ -344,7 +350,8 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                 pass
         except Exception as e:
             if "'NoneType' object has no attribute 'group'" in str(e):
-                self.Main_window.update_list(f"没有从重定向的链接中获取到参数，请检查网线连接，或者是否已经能够上网了？{e}")
+                self.Main_window.update_list(
+                    f"没有从重定向的链接中获取到参数，请检查网线连接，或者是否已经能够上网了？{e}")
             else:
                 self.Main_window.update_list(f"获取参数失败(请检查网线，并确保断开了热点)：{e}")
             self.label_4.show()

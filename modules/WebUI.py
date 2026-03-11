@@ -1329,6 +1329,7 @@ const peers = data.peer || [];
 </html>
 """
 
+
 class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
     _api_cache_lock = threading.Lock()
     _api_cache_data = None
@@ -1338,24 +1339,24 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if getattr(sys, 'frozen', False):
             base_dir = os.path.dirname(sys.executable)
-        
+
         return os.path.join(base_dir, "easytier", "easytier-cli.exe")
 
     def run_cli_cmd(self, cmd_name):
         cli_exe = self.get_easytier_cli()
         if not os.path.exists(cli_exe):
             return {"error": "找不到 easytier-cli.exe", "path": cli_exe}
-            
+
         try:
             result = subprocess.run(
-                [cli_exe, "-p", "127.0.0.1:15888", "-o", "json", cmd_name], 
-                capture_output=True, 
+                [cli_exe, "-p", "127.0.0.1:15888", "-o", "json", cmd_name],
+                capture_output=True,
                 text=True,
                 encoding='utf-8',
                 timeout=3,
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
-            
+
             if result.returncode == 0:
                 try:
                     return json.loads(result.stdout)
@@ -1386,7 +1387,7 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         try:
-        # 防外网访问控制（禁止非本机访问部分路由）
+            # 防外网访问控制（禁止非本机访问部分路由）
             client_ip = self.client_address[0]
             is_local = (client_ip == '127.0.0.1' or client_ip == 'localhost')
 
@@ -1401,31 +1402,35 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
-                page = HTML_PAGE.replace('</body>', f'<div style="text-align: center; margin-top: 5px; margin-bottom: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6;">InterKnot v{state.version}</div></body>')
+                page = HTML_PAGE.replace(
+                    '</body>', f'<div style="text-align: center; margin-top: 5px; margin-bottom: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6;">InterKnot v{state.version}</div></body>')
                 self.wfile.write(page.encode('utf-8'))
-            
+
             elif self.path == '/download':
                 # 外网专属页面
                 # 检查是否启用 WebDL
                 if not state.et_enable_webdl:
                     self.send_response(403)
-                    self.send_header('Content-type', 'text/plain; charset=utf-8')
+                    self.send_header(
+                        'Content-type', 'text/plain; charset=utf-8')
                     self.end_headers()
                     self.wfile.write(b"Download service is disabled.")
                     return
-                
+
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
-                page = DOWNLOAD_HTML_PAGE.replace('</body>', f'<div style="text-align: center; padding: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6; position: absolute; bottom: 20px; left: 0; right: 0;">InterKnot v{state.version}</div></body>')
+                page = DOWNLOAD_HTML_PAGE.replace(
+                    '</body>', f'<div style="text-align: center; padding: 10px; font-size: 0.8em; color: var(--text-main); opacity: 0.6; position: absolute; bottom: 20px; left: 0; right: 0;">InterKnot v{state.version}</div></body>')
                 self.wfile.write(page.encode('utf-8'))
-            
+
             elif self.path == '/download/InterKnot':
                 # 提供InterKnot压缩包下载
                 # 检查是否启用 WebDL
                 if not state.et_enable_webdl:
                     self.send_response(403)
-                    self.send_header('Content-type', 'text/plain; charset=utf-8')
+                    self.send_header(
+                        'Content-type', 'text/plain; charset=utf-8')
                     self.end_headers()
                     self.wfile.write(b"This Page is not accessible.")
                     return
@@ -1433,21 +1438,23 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                 temp_dir = os.path.join(tempfile.gettempdir(), "InterKnot")
                 file_path = os.path.join(temp_dir, "InterKnot.zip")
                 log_path = os.path.join(state.config_dir, "downloads.log")
-                
+
                 if os.path.exists(file_path):
                     # 文件存在，记录下载日志
                     try:
                         os.makedirs(state.config_dir, exist_ok=True)
                         with open(log_path, 'a', encoding='utf-8') as log_file:
                             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            log_file.write(f"[{timestamp}] Download from {client_ip}\n")
+                            log_file.write(
+                                f"[{timestamp}] Download from {client_ip}\n")
                     except Exception as e:
                         print(f"Failed to write download log: {e}")
-                    
+
                     # 提供文件下载
                     self.send_response(200)
                     self.send_header('Content-type', 'application/zip')
-                    self.send_header('Content-Disposition', 'attachment; filename="InterKnot.zip"')
+                    self.send_header('Content-Disposition',
+                                     'attachment; filename="InterKnot.zip"')
                     file_size = os.path.getsize(file_path)
                     self.send_header('Content-Length', str(file_size))
                     self.end_headers()
@@ -1461,44 +1468,51 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                         # 调用 main_window 的 share_zip 方法生成文件
                         if hasattr(self.server, 'main_window') and hasattr(self.server.main_window, 'share_zip'):
                             self.server.main_window.share_zip()
-                        
+
                         # 返回 202 Accepted，告诉前端正在准备
                         self.send_response(202)
-                        self.send_header('Content-type', 'application/json; charset=utf-8')
+                        self.send_header(
+                            'Content-type', 'application/json; charset=utf-8')
                         self.end_headers()
-                        
+
                         # 获取准备文件的进度
-                        progress = getattr(self.server.main_window, 'zip_progress', 0) if hasattr(self.server, 'main_window') else 0
+                        progress = getattr(self.server.main_window, 'zip_progress', 0) if hasattr(
+                            self.server, 'main_window') else 0
                         progress_text = f"正在打包文件 ({progress:.1f}%)" if progress > 0 else "文件正在准备中，请稍候..."
-                        
-                        response = {"status": "preparing", "message": progress_text, "progress": progress}
-                        self.wfile.write(json.dumps(response, ensure_ascii=False).encode('utf-8'))
+
+                        response = {"status": "preparing",
+                                    "message": progress_text, "progress": progress}
+                        self.wfile.write(json.dumps(
+                            response, ensure_ascii=False).encode('utf-8'))
                         return
                     except Exception as e:
                         print(f"Failed to trigger share_zip: {e}")
                         self.send_response(500)
-                        self.send_header('Content-type', 'application/json; charset=utf-8')
+                        self.send_header(
+                            'Content-type', 'application/json; charset=utf-8')
                         self.end_headers()
                         response = {"status": "error", "message": "文件生成失败"}
-                        self.wfile.write(json.dumps(response, ensure_ascii=False).encode('utf-8'))
+                        self.wfile.write(json.dumps(
+                            response, ensure_ascii=False).encode('utf-8'))
                         return
-                
+
                 self.send_response(404)
                 self.send_header('Content-type', 'text/plain; charset=utf-8')
                 self.end_headers()
                 self.wfile.write(b"File not found.")
-            
+
             elif self.path == '/chart.js':
                 try:
                     from modules.chart_js import CHART_JS_CODE
                 except ImportError:
                     from chart_js import CHART_JS_CODE
                 self.send_response(200)
-                self.send_header('Content-type', 'application/javascript; charset=utf-8')
+                self.send_header(
+                    'Content-type', 'application/javascript; charset=utf-8')
                 self.send_header('Cache-Control', 'max-age=31536000')
                 self.end_headers()
                 self.wfile.write(CHART_JS_CODE.encode('utf-8'))
-            
+
             elif self.path == '/api/info':
                 if not is_local:
                     # 拒绝外网请求API
@@ -1507,21 +1521,23 @@ class EasyTierAPIHandler(http.server.SimpleHTTPRequestHandler):
                     return
 
                 self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header(
+                    'Content-type', 'application/json; charset=utf-8')
                 self.end_headers()
                 data = self.get_api_info_cached()
                 self.wfile.write(json.dumps(data).encode('utf-8'))
-            
+
             else:
                 self.send_response(404)
                 self.end_headers()
         except (ConnectionAbortedError, BrokenPipeError, ConnectionResetError):
             # 浏览器中止请求时避免抛出噪音异常
             pass
-            
+
     # Suppress log messages to stdout
     def log_message(self, format, *args):
         pass
+
 
 def start_webui_server(main_window):
     global _webui_httpd
@@ -1542,6 +1558,7 @@ def start_webui_server(main_window):
         with _webui_httpd_lock:
             _webui_httpd = None
         state.webui_thread = None
+
 
 def stop_webui_server():
     global _webui_httpd
@@ -1564,10 +1581,11 @@ def stop_webui_server():
 
     state.webui_thread = None
 
+
 class WebUIThread(QThread):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+
     def run(self):
         start_webui_server(self.main_window)
-        

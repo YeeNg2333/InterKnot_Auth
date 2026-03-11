@@ -41,7 +41,7 @@ class SecurityManager:
         # print("Encryption key:", key.hex())
 
         return key
-    
+
     @staticmethod
     def encrypt(data: str, key: bytes) -> str:
         cipher = AES.new(key, AES.MODE_GCM)
@@ -51,7 +51,7 @@ class SecurityManager:
         result = cipher.nonce + tag + ciphertext
 
         return base64.b64encode(result).decode()
-    
+
     @staticmethod
     def decrypt(token: str, key: bytes) -> str:
         raw = base64.b64decode(token)
@@ -65,7 +65,7 @@ class SecurityManager:
         data = cipher.decrypt_and_verify(ciphertext, tag)
 
         return data.decode()
-    
+
     @staticmethod
     def save_password(username: str, password: str):
         key = SecurityManager.get_encryption_key()
@@ -85,7 +85,8 @@ class SecurityManager:
             return None
 
         try:
-            decrypted_password = SecurityManager.decrypt(encrypted_password, key)
+            decrypted_password = SecurityManager.decrypt(
+                encrypted_password, key)
         except Exception as e:
             print(f"Error decrypting password for {username}: {e}")
             keyring.delete_password("InterKnot", username)
@@ -98,7 +99,9 @@ class SecurityManager:
         try:
             keyring.delete_password("InterKnot", username)
             print(f"Password for {username} deleted.")
-        except: pass
+        except:
+            pass
+
 
 class CredentialManager:
 
@@ -155,7 +158,7 @@ class CredentialManager:
 
         # 去重
         return list(dict.fromkeys(users))
-    
+
 
 # a = CredentialManager.list_usernames(service="InterKnot")
-# print(a) 
+# print(a)

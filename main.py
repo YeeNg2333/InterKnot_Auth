@@ -28,6 +28,7 @@ state = global_state()
 # debugpy.listen(("0.0.0.0", 5678))
 # debugpy.wait_for_client()  # 等待调试器连接
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setupUi(self, MainWindow):
         super().setupUi(MainWindow)
@@ -37,7 +38,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.run_settings_action = QtWidgets.QAction("设置", self)
         self.menubar.insertAction(None, self.run_settings_action)
         self.menu_2.menuAction().setVisible(False)
-        self.action_3.triggered.connect(lambda: os.system("start http://localhost:50000"))
+        self.action_3.triggered.connect(
+            lambda: os.system("start http://localhost:50000"))
 
     def __init__(self):
 
@@ -78,26 +80,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 绑定按钮功能
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.logout)
-        self.checkBox.clicked.connect(lambda checked: (self.update_config("save_pwd", "1" if checked else "0") or self.init_save_password(checked)))
-        
+        self.checkBox.clicked.connect(lambda checked: (self.update_config(
+            "save_pwd", "1" if checked else "0") or self.init_save_password(checked)))
+
         self.checkBox_2.clicked.connect(lambda: self.update_config(
             "auto_connect", 1 if self.checkBox_2.isChecked() else 0) or (
                 self.update_list("开机将自启，并自动登录，需要记住密码\n看门狗每10分钟检测一次网络连接情况\n下次自动登录成功时，将启动看门狗") if self.checkBox_2.isChecked() else None) or (
                 self.checkBox.setChecked(True) if self.checkBox_2.isChecked() else None) or (
                     self.add_to_startup() if self.checkBox_2.isChecked() else self.add_to_startup(1)) or (self.update_config("save_pwd", 1))
         )
-        self.checkBox_auto_share.clicked.connect(lambda checked: self.enable_auto_share(checked))
+        self.checkBox_auto_share.clicked.connect(
+            lambda checked: self.enable_auto_share(checked))
 
-        self.checkBox_t.clicked.connect(lambda: self.change_login_mode(1 if self.checkBox_t.isChecked() else 0))
+        self.checkBox_t.clicked.connect(lambda: self.change_login_mode(
+            1 if self.checkBox_t.isChecked() else 0))
 
         self.checkBox_dog.clicked.connect(lambda: self.update_config(
             "enable_watch_dog", 1 if self.checkBox_dog.isChecked() else 0) or (self.update_list("看门狗将在下次登录时开启，持续监测网络状态，根据网卡状态智能重连") if self.checkBox_dog.isChecked() else self.update_list("看门狗已禁用")))
-        
+
         self.pushButton_3.clicked.connect(
             lambda: web.open_new("https://cmxz.top"))
         self.run_settings_action.triggered.connect(self.run_settings)
         self.pushButton_4.clicked.connect(self.settings_window.mulit_login_now)
-        self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
+        self.pushButton_enable_share.clicked.connect(
+            lambda: self.start_easytier(True))
 
         self.comboBox_username.currentTextChanged.connect(self.on_user_changed)
         view = self.comboBox_username.view()
@@ -113,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if not index.isValid():
             return
-        
+
         row = index.row()
         username = self.comboBox_username.itemText(row)
 
@@ -203,11 +209,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def get_password(self):
         if state.save_pwd != "1":
             return
-        
+
         aes_key = SecurityManager.get_encryption_key()
 
         if state.password != aes_key.hex():
-            self.update_list("检测到设备已更换或未保存有效密码，请重新输入密码！\nInterKnot_Auth 密码采用机器指纹加密，与设备绑定，设备变化将无法解密")
+            self.update_list(
+                "检测到设备已更换或未保存有效密码，请重新输入密码！\nInterKnot_Auth 密码采用机器指纹加密，与设备绑定，设备变化将无法解密")
 
         elif state.password == aes_key.hex():
             password = SecurityManager.get_password(state.username)
@@ -239,14 +246,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBox_username.clear()
 
         accounts = CredentialManager.list_usernames(service="InterKnot")
-        if accounts is not None: # 将保存的账号添加到下拉框中
+        if accounts is not None:  # 将保存的账号添加到下拉框中
             for username in accounts:
                 self.comboBox_username.addItem(username)
 
             if current_accounts != '':
                 self.comboBox_username.setCurrentText(current_accounts)
 
-            elif state.username in accounts: # 选择配置文件中的账号
+            elif state.username in accounts:  # 选择配置文件中的账号
                 index = self.comboBox_username.findText(state.username)
                 if index != -1:
                     self.comboBox_username.setCurrentIndex(index)
@@ -260,12 +267,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 禁用提示
             item = self.comboBox_username.model().item(self.comboBox_username.count() - 1)
             item.setEnabled(False)
-            item.setForeground(QColor(150,150,150))
+            item.setForeground(QColor(150, 150, 150))
 
     def on_user_changed(self, username):
         if username == "":
             return
-        
+
         password = SecurityManager.get_password(username)
         self.lineEdit_2.setText(password if password else "")
 
@@ -276,6 +283,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def add_to_startup(self, mode=None):
 
         TASK_NAME = "InterKnot_Auth"
+
         def run(cmd):
             return subprocess.run(
                 cmd,
@@ -283,7 +291,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 text=True,
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
-        
+
         # 当前程序路径
         app_path = sys.argv[0]
 
@@ -297,7 +305,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if r.returncode == 0:
                     self.update_list("开机自启已关闭")
                 else:
-                    self.update_list(f"关闭失败：{r.stderr or r.stdout}\n尝试以管理员权限运行软件")
+                    self.update_list(
+                        f"关闭失败：{r.stderr or r.stdout}\n尝试以管理员权限运行软件")
             else:
                 self.update_list("开机自启项不存在，无需删除。")
             return
@@ -335,7 +344,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if state.auto_share == "1":
                     self.update_list("警告：自动共享开启且登录方式为隧道时，将不会自动连接！")
                     return
-                
+
                 self.connect_et()
                 return
 
@@ -428,15 +437,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.checkBox_auto_share.setChecked(state.auto_share == "1")
 
         if state.first_run == 1:
-            self.show_message(message=
-                            '欢迎加入绳网（InterKnot）！\n'
-                            '在无形的数据洪流之中，我们以结为契，以绳为网，将零散的节点重新编织。绳网源于对效率与自由的追求——让繁琐的认证流程化作一次优雅的连接。\n\n'
-                            '借助 EasyTier 的组网能力，已连接的设备还可作为出口节点，在封闭的边界之中，悄然编织属于自己的通路。\n\n'
-                            '<a href="https://github.com/Yish1/InterKnot_Auth">'
-                            'InterKnot项目地址: Yish1/InterKnot_Auth'
-                            '</a>',
-                            title="欢迎",
-                            first=1)
+            self.show_message(message='欢迎加入绳网（InterKnot）！\n'
+                              '在无形的数据洪流之中，我们以结为契，以绳为网，将零散的节点重新编织。绳网源于对效率与自由的追求——让繁琐的认证流程化作一次优雅的连接。\n\n'
+                              '借助 EasyTier 的组网能力，已连接的设备还可作为出口节点，在封闭的边界之中，悄然编织属于自己的通路。\n\n'
+                              '<a href="https://github.com/Yish1/InterKnot_Auth">'
+                              'InterKnot项目地址: Yish1/InterKnot_Auth'
+                              '</a>',
+                              title="欢迎",
+                              first=1)
             self.update_config("first_run", 0)
             self.remove_useless_config(state.config_path)
 
@@ -494,7 +502,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         state.password = password
 
         ipv4_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
-        if ipv4_pattern.match(username): # z正则判断是否是ip
+        if ipv4_pattern.match(username):  # z正则判断是否是ip
             is_ip = self.is_ipv4(username)
             if is_ip:
                 self.connect_et()
@@ -505,7 +513,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 self.update_list("输的啥玩意啊？IP地址有这样写的吗？")
                 return
-        
+
         if state.esurfingurl == "0.0.0.0:0" or state.esurfingurl == "自动获取失败,请检查网线连接":
             self.run_settings()
             self.update_list("请先获取或手动填写参数！")
@@ -722,17 +730,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(text)
 
     def update_et_list(self, text):
-        
+
         # 超过 1000 行，就从前面开始删除
         if self.listWidget_easytier.count() >= 1000:
             self.listWidget_easytier.takeItem(0)
 
         self.listWidget_easytier.addItem(text)
-        self.listWidget_easytier.setCurrentRow(self.listWidget_easytier.count() - 1)
+        self.listWidget_easytier.setCurrentRow(
+            self.listWidget_easytier.count() - 1)
         print(text)
 
     def check_new_version(self):
-        
+
         self.update_thread = UpdateThread()
         state.threadpool.start(self.update_thread)
         self.update_thread.signals.show_message.connect(
@@ -765,7 +774,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if message is None:
             message = "未知错误"
         message = str(message)
-        
+
         if first == 1:
             msgBox.setIconPixmap(QtGui.QIcon(
                 ':/icon/yish.ico').pixmap(100, 100))
@@ -773,7 +782,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             lines = message.split('\n', 1)
             remaining = lines[1].replace('\n', '<br>')
             message = f'<h2 style="margin: 0; padding: 0;">{lines[0]}</h2><br>{remaining}'
-    
+
         msgBox.setText(message)
         msgBox.exec_()
 
@@ -793,16 +802,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if hasattr(self, "et_connected") and self.et_connected == True:
                 self.show_message(message="您已连接隧道，如需启动共享需先断开隧道!", title="错误")
                 return
-            
+
             try:
                 self.pushButton_enable_share.setText("停止共享")
                 self.pushButton_enable_share.clicked.disconnect()
-                self.pushButton_enable_share.clicked.connect(lambda: self.stop_easytier())
+                self.pushButton_enable_share.clicked.connect(
+                    lambda: self.stop_easytier())
 
-                self.easytier_thread = easytier_thread(self, mode = "server")
-                self.easytier_thread.signals.print_text.connect(self.update_list)
-                self.easytier_thread.signals.print_text_et.connect(self.update_et_list)
-                self.easytier_thread.signals.finished.connect(self.stop_easytier)
+                self.easytier_thread = easytier_thread(self, mode="server")
+                self.easytier_thread.signals.print_text.connect(
+                    self.update_list)
+                self.easytier_thread.signals.print_text_et.connect(
+                    self.update_et_list)
+                self.easytier_thread.signals.finished.connect(
+                    self.stop_easytier)
                 state.threadpool.start(self.easytier_thread)
                 self.menu_2.menuAction().setVisible(True)
 
@@ -820,7 +833,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
                 self.pushButton_enable_share.setText("启用共享")
                 self.pushButton_enable_share.clicked.disconnect()
-                self.pushButton_enable_share.clicked.connect(lambda: self.start_easytier(True))
+                self.pushButton_enable_share.clicked.connect(
+                    lambda: self.start_easytier(True))
                 self.pushButton.setEnabled(True)
 
             if hasattr(self, 'et_connected') and self.et_connected:
@@ -830,7 +844,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.menu_2.menuAction().setVisible(False)
             stop_webui_server()
             self.update_list("ET: WebUI服务端已关闭")
-                
+
         except Exception as e:
             self.update_list(f"ET: 停止隧道失败：{e}")
 
@@ -867,9 +881,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.pushButton.setEnabled(False)
             self.menu_2.menuAction().setVisible(True)
 
-            self.easytier_thread = easytier_thread(self, mode = "client")
+            self.easytier_thread = easytier_thread(self, mode="client")
             self.easytier_thread.signals.print_text.connect(self.update_list)
-            self.easytier_thread.signals.print_text_et.connect(self.update_et_list)
+            self.easytier_thread.signals.print_text_et.connect(
+                self.update_et_list)
             self.easytier_thread.signals.finished.connect(self.stop_easytier)
             state.threadpool.start(self.easytier_thread)
             self.et_connected = True
@@ -879,18 +894,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.menu_2.menuAction().setVisible(False)
 
     def enable_auto_share(self, checked):
-        self.update_config("auto_share", 1 if self.checkBox_auto_share.isChecked() else 0)
-        self.update_list("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked() else self.update_list("已关闭自动共享")
+        self.update_config(
+            "auto_share", 1 if self.checkBox_auto_share.isChecked() else 0)
+        self.update_list("已开启自动共享，启动时将自动启动隧道") if self.checkBox_auto_share.isChecked(
+        ) else self.update_list("已关闭自动共享")
 
         # 如果账号框里时ip，弹出警告
         if self.is_ipv4(self.comboBox_username.currentText()) and checked:
-            self.show_message(message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")    
+            self.show_message(
+                message="当前登录方式为隧道，开启自动共享后自动登录将不会连接隧道！\n\n连接隧道与共享网络是冲突的！", title="警告")
 
     def share_zip(self):
         if hasattr(self, "processing_zip") and self.processing_zip is True:
             return
-        
+
         self.zip_progress = 0
+
         def zip_worker():
 
             base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -925,7 +944,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     bar_len = 30
                     filled_len = int(bar_len * i // total)
                     bar = '█' * filled_len + '-' * (bar_len - filled_len)
-                    print(f"\r压缩进度: |{bar}| {percent:.1f}% ({i}/{total})", end='')
+                    print(
+                        f"\r压缩进度: |{bar}| {percent:.1f}% ({i}/{total})", end='')
 
             # 原子替换
             os.replace(temp_zip, final_zip)
@@ -936,6 +956,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         t = threading.Thread(target=zip_worker, daemon=True)
         self.processing_zip = True
         t.start()
+
 
 class login_Retry_Thread(QRunnable):
     def __init__(self, times, parent=None):
@@ -1053,7 +1074,7 @@ if __name__ == "__main__":
 
 # # 编译指令
 # nuitka --standalone --lto=yes --clang --msvc=latest `
-    
+
 # Windows 设置
 # --windows-console-mode=disable `
 # --windows-uac-admin `
