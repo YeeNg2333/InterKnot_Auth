@@ -79,33 +79,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_4">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>27</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-    color: rgb(207, 1, 1);
-}</string>
-            </property>
-            <property name="text">
-             <string>自动获取失败，请确保没有连接手机热点，或检查网线连接</string>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label">
             <property name="text">
              <string>登录URL</string>

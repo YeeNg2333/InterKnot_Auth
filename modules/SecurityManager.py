@@ -54,17 +54,22 @@ class SecurityManager:
 
     @staticmethod
     def decrypt(token: str, key: bytes) -> str:
-        raw = base64.b64decode(token)
+        try:
+            raw = base64.b64decode(token)
 
-        nonce = raw[:16]
-        tag = raw[16:32]
-        ciphertext = raw[32:]
+            nonce = raw[:16]
+            tag = raw[16:32]
+            ciphertext = raw[32:]
 
-        cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+            cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
 
-        data = cipher.decrypt_and_verify(ciphertext, tag)
+            data = cipher.decrypt_and_verify(ciphertext, tag)
 
-        return data.decode()
+            return data.decode()
+        
+        except Exception as e:
+            print(f"Failed to decrypt token: {e}")
+            return ""
 
     @staticmethod
     def save_password(username: str, password: str):

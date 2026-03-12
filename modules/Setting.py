@@ -28,8 +28,6 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.resize(340, 420)
 
-        self.label_4.hide()
-
         self.Main_window = Main_window
         self.stop_flag = False
         self.init_finished = False
@@ -344,7 +342,6 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
             self.get_config_value()
             try:
                 self.pushButton.setEnabled(True)
-                self.label_4.hide()
                 self.Main_window.update_list("成功获取参数")
             except:
                 pass
@@ -353,8 +350,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                 self.Main_window.update_list(
                     f"没有从重定向的链接中获取到参数，请检查网线连接，或者是否已经能够上网了？{e}")
             else:
-                self.Main_window.update_list(f"获取参数失败(请检查网线，并确保断开了热点)：{e}")
-            self.label_4.show()
+                self.Main_window.show_message(message="自动获取失败，请检查以下项目\n\n①确保没有连接手机热点\n②已经登录过校园网需先断开\n③检查是否开启网络代理\n④检查网线连接", title="错误")
             self.pushButton.setEnabled(False)
 
     def run_settings_window(self):

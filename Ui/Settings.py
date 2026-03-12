@@ -46,16 +46,6 @@ class Ui_sac_settings(object):
         self.pushButton_3.setMinimumSize(QtCore.QSize(0, 33))
         self.pushButton_3.setObjectName("pushButton_3")
         self.verticalLayout.addWidget(self.pushButton_3)
-        self.label_4 = QtWidgets.QLabel(self.frame)
-        self.label_4.setMinimumSize(QtCore.QSize(0, 27))
-        self.label_4.setStyleSheet("QLabel {\n"
-"    color: rgb(207, 1, 1);\n"
-"}")
-        self.label_4.setScaledContents(False)
-        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_4.setWordWrap(True)
-        self.label_4.setObjectName("label_4")
-        self.verticalLayout.addWidget(self.label_4)
         self.label = QtWidgets.QLabel(self.frame)
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
@@ -220,7 +210,6 @@ class Ui_sac_settings(object):
         _translate = QtCore.QCoreApplication.translate
         sac_settings.setWindowTitle(_translate("sac_settings", "Form"))
         self.pushButton_3.setText(_translate("sac_settings", "自动获取"))
-        self.label_4.setText(_translate("sac_settings", "自动获取失败，请确保没有连接手机热点，或检查网线连接"))
         self.label.setText(_translate("sac_settings", "登录URL"))
         self.label_2.setText(_translate("sac_settings", "登录服务器IP"))
         self.label_3.setText(_translate("sac_settings", "本地IP"))

@@ -383,6 +383,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def run_settings(self):
 
+        if hasattr(self, "settings_window") == False:
+            return
+
         if self.settings_window is not None and self.settings_window.isVisible() == False:
             try:
                 self.settings_window = settingsWindow(self)
