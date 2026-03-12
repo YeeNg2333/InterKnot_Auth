@@ -332,7 +332,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
 
     def get_default(self):
         try:
-            response = requests.get(url="http://189.cn/", timeout=2)
+            response = requests.get(url="http://189.cn/", timeout=2, proxies={"http": None, "https": None})
             state.esurfingurl = re.search(
                 "http://(.+?)/", response.url).group(1)
             state.wlanacip = re.search(
