@@ -70,7 +70,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 启动前运行
         try:
             self.init_log()
-            self.update_list(f"欢迎加入绳网（InterKnot）！{a}")
+            self.update_list(f"欢迎加入绳网（InterKnot）！\nV{state.version}")
             self.read_config()
             self.get_password()
             self.add_account_to_combox()
