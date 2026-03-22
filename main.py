@@ -591,14 +591,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 status = f"登录失败: {data['resultInfo']}"
                 self.update_list(status)
+                error_msg = ["认证失败", "过于频繁", "没有定购此产品", "密码错误"]
 
-                if data['resultInfo'] == "用户认证失败" or data['resultInfo'] == "密码错误":
+                matched_key = next((key for key in error_msg if key in status), None)
+
+                if matched_key:
                     state.stop_watch_dog = True
                     state.stop_retry_thread = True
-                    if getattr(state, 'retry_thread_started') == True:
-                        self.update_list("密码错误，取消自动重试")
+                    if getattr(state, 'retry_thread_started', False):
+                        self.update_list(f"由于{matched_key},取消自动重试")
                     return
-
+                
                 if data['resultInfo'] == "验证码错误":
                     if mode == "mulit":
                         pass
