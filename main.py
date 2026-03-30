@@ -368,7 +368,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.read_config()
 
         # 直接自动获取覆盖登录IP信息，设为1时生效。
-        if state.auto_update_userip == 1:
+        if state.auto_update_userip == "1":
+            self.update_list("正在重新获取登录IP......")
             settingsWindow.get_default(self.settings_window)
         if state.auto_connect == "1":
             self.update_list("正在尝试自动连接...")
@@ -454,6 +455,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             ('login_mode', 0, int),
             ('enable_watch_dog', "1", str),
             ('auto_share', "0", str),
+            ('auto_update_userip', "0", str),
             # Easytier
             ('et_secret_key', "Hello_InterKnot", str),
             ('et_enable_ipv6', 0, int),
