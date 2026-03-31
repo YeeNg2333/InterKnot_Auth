@@ -359,6 +359,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                 self.pushButton_3.setText("自动获取")
 
             if mode == "nomsgbox_autologin":
+                self.save_config()
                 self.Main_window.try_auto_connect()
 
         self.pushButton_3.setEnabled(False)

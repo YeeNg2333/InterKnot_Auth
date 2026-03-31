@@ -372,7 +372,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if state.auto_update_userip == "1":
             self.update_list("正在重新获取登录IP......")
             self.settings_window.get_default(mode="nomsgbox_autologin")
-            self.settings_window.save_config()
 
     def try_auto_connect(self):
 
