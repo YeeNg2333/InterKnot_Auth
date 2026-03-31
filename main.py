@@ -366,7 +366,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def try_auto_connect(self):
 
         # 直接自动获取覆盖登录IP信息，设为1时生效。
-        if state.auto_update_userip == "1":
+        if state.auto_update_userip == "1" and state.auto_connect == "1":
             self.update_list("正在重新获取登录IP......")
             settingsWindow.get_default(self.settings_window)
             update_entry('esurfingurl', str(state.esurfingurl), state.config_path)
