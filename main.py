@@ -110,7 +110,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             view.customContextMenuRequested.connect(self.show_combo_menu)
 
             # 启动后运行
-            self.try_auto_connect()
+            if state.auto_update_userip == "1":
+                self.auto_connect_reload_ip()
+            else:
+                self.try_auto_connect()
+                
             self.start_easytier()
 
         except Exception as e:
@@ -364,18 +368,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.update_list(f"创建开机自启失败：{r.stderr or r.stdout}\n尝试以管理员权限运行软件")
 
-    def update_login_config(self):
-        self.update_list("正在重新获取登录IP......")
-        self.settings_window.get_default()
-        self.update_config('esurfingurl', str(state.esurfingurl))
-        self.update_config('wlanuserip', str(state.wlanuserip))
-        self.update_config('wlanacip', str(state.wlanacip))
+    def auto_connect_reload_ip(self):
+        if state.auto_update_userip == "1":
+            self.update_list("正在重新获取登录IP......")
+            self.settings_window.get_default(mode="nomsgbox_autologin")
+            self.settings_window.save_config()
 
     def try_auto_connect(self):
 
         self.read_config()
-        if state.auto_update_userip == "1":
-            self.update_login_config()
 
         if state.auto_connect == "1":
             self.update_list("正在尝试自动连接...")
