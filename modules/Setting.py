@@ -350,6 +350,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
                 self.Main_window.update_list("成功获取参数")
                 self.pushButton_3.setEnabled(True)
                 self.get_config_value()
+                self.pushButton_3.setText("自动获取")
             
             else:
                 self.pushButton_3.setEnabled(True)
