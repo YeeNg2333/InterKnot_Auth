@@ -318,6 +318,7 @@ class settingsWindow(QtWidgets.QMainWindow, Ui_sac_settings):  # 设置窗口
         self.lineEdit_3.setText(state.wlanuserip)
         # 获取本地网卡IP
         local_ip = self.get_lan_ip()
+        self.comboBox.clear()
         self.comboBox.addItem(local_ip if isinstance(
             local_ip, str) else local_ip[0])
         self.comboBox.addItem("IP仅供参考，分享请使用物理IP")
